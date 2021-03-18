@@ -1,4 +1,4 @@
 NDK_MAJOR := 23
 NDK_MINOR := 0
-NDK_BETA := 1
-NDK_CANARY := false
+NDK_BETA := 0
+NDK_CANARY := true
