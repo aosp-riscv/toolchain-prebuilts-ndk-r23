@@ -31,7 +31,6 @@ TARGET-get-linker-objects-and-libraries = \
     $(call host-path, $1) \
     $(call link-whole-archives,$3) \
     $(call host-path, $2) \
-    $(PRIVATE_LIBGCC) \
     $(PRIVATE_LIBATOMIC) \
     $(call host-path, $4) \
 
@@ -42,15 +41,6 @@ TARGET_FORMAT_STRING_CFLAGS := -Wformat -Werror=format-security
 # This flag disables the above security checks
 TARGET_DISABLE_FORMAT_STRING_CFLAGS := -Wno-error=format-security
 
-# NOTE: Ensure that TARGET_LIBGCC is placed after all private objects
-#       and static libraries, but before any other library in the link
-#       command line when generating shared libraries and executables.
-#
-#       This ensures that all libgcc.a functions required by the target
-#       will be included into it, instead of relying on what's available
-#       on other libraries like libc.so, which may change between system
-#       releases due to toolchain or library changes.
-#
 define cmd-build-shared-library
 $(PRIVATE_CXX) \
     -Wl,-soname,$(notdir $(LOCAL_BUILT_MODULE)) \
@@ -90,8 +80,7 @@ cmd-strip = $(PRIVATE_STRIP) $(PRIVATE_STRIP_MODE) $(call host-path,$1)
 # script. Hide both regardless of architecture to future-proof us in case we
 # move other architectures to a linker script (which we may want to do so we
 # automatically link libclangrt on other architectures).
-TARGET_LIBGCC = -lgcc -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libgcc_real.a
-TARGET_LIBATOMIC = -latomic -Wl,--exclude-libs,libatomic.a
+TARGET_LIBATOMIC = -latomic
 TARGET_LDLIBS := -lc -lm
 
 TOOLCHAIN_ROOT := $(NDK_ROOT)/toolchains/llvm/prebuilt/$(HOST_TAG64)
@@ -102,11 +91,8 @@ LLVM_TOOLCHAIN_PREFIX := $(TOOLCHAIN_ROOT)/bin/
 # the toolchain's setup.mk script.
 TOOLCHAIN_PREFIX = $(TOOLCHAIN_ROOT)/bin/$(TOOLCHAIN_NAME)-
 
-ifneq ($(findstring ccc-analyzer,$(CC)),)
-    TARGET_CC = $(CC)
-else
-    TARGET_CC = $(LLVM_TOOLCHAIN_PREFIX)clang$(HOST_EXEEXT)
-endif
+TARGET_CC = $(LLVM_TOOLCHAIN_PREFIX)clang$(HOST_EXEEXT)
+TARGET_CXX = $(LLVM_TOOLCHAIN_PREFIX)clang++$(HOST_EXEEXT)
 
 CLANG_TIDY = $(LLVM_TOOLCHAIN_PREFIX)clang-tidy$(HOST_EXEEXT)
 
@@ -142,12 +128,6 @@ GLOBAL_CXXFLAGS = $(GLOBAL_CFLAGS) -fno-exceptions -fno-rtti
 TARGET_CFLAGS =
 TARGET_CONLYFLAGS =
 TARGET_CXXFLAGS = $(TARGET_CFLAGS)
-
-ifneq ($(findstring c++-analyzer,$(CXX)),)
-    TARGET_CXX = $(CXX)
-else
-    TARGET_CXX = $(LLVM_TOOLCHAIN_PREFIX)clang++$(HOST_EXEEXT)
-endif
 
 TARGET_RS_CC    = $(RENDERSCRIPT_TOOLCHAIN_PREFIX)llvm-rs-cc
 TARGET_RS_BCC   = $(RENDERSCRIPT_TOOLCHAIN_PREFIX)bcc_compat
