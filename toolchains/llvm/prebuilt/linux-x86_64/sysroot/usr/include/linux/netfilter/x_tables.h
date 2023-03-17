@@ -18,7 +18,7 @@
  ****************************************************************************/
 #ifndef _UAPI_X_TABLES_H
 #define _UAPI_X_TABLES_H
-#include <linux/kernel.h>
+#include <linux/const.h>
 #include <linux/types.h>
 #define XT_FUNCTION_MAXNAMELEN 30
 #define XT_EXTENSION_MAXNAMELEN 29
@@ -36,7 +36,7 @@ struct xt_entry_match {
     } kernel;
     __u16 match_size;
   } u;
-  unsigned char data[0];
+  unsigned char data[];
 };
 struct xt_entry_target {
   union {
@@ -87,7 +87,7 @@ struct xt_counters {
 struct xt_counters_info {
   char name[XT_TABLE_MAXNAMELEN];
   unsigned int num_counters;
-  struct xt_counters counters[0];
+  struct xt_counters counters[];
 };
 #define XT_INV_PROTO 0x40
 #define XT_MATCH_ITERATE(type,e,fn,args...) \

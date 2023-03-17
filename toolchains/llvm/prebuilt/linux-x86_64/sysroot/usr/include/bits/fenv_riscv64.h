@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 The Android Open Source Project
+ * Copyright (C) 2022 The Android Open Source Project
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,10 +32,10 @@
 
 __BEGIN_DECLS
 
-typedef unsigned int fexcept_t;
-typedef unsigned int fenv_t;
+typedef __uint32_t fenv_t;
+typedef __uint32_t fexcept_t;
 
-/* Exception flags. */
+/* Exception flags. No FE_DENORMAL for riscv64. */
 #define FE_INEXACT    0x01
 #define FE_UNDERFLOW  0x02
 #define FE_OVERFLOW   0x04

@@ -26,9 +26,11 @@
 #include "unicode/utypes.h"
 #include "unicode/uenum.h"
 
-/**    
+/**
+ * @addtogroup ICU4C
+ * @{
  * \file
- * \brief  C API: Locale 
+ * \brief C API: Locale ID functionality similar to C++ class Locale
  *
  * <h2> ULoc C API for Locale </h2>
  * A <code>Locale</code> represents a specific geographical, political,
@@ -199,125 +201,125 @@
  * @see UResourceBundle
  */
 
-/** Useful constant for this language. @stable ICU 2.0 */
+/** Useful constant for this language. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_CHINESE            "zh"
-/** Useful constant for this language. @stable ICU 2.0 */
+/** Useful constant for this language. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_ENGLISH            "en"
-/** Useful constant for this language. @stable ICU 2.0 */
+/** Useful constant for this language. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_FRENCH             "fr"
-/** Useful constant for this language. @stable ICU 2.0 */
+/** Useful constant for this language. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_GERMAN             "de"
-/** Useful constant for this language. @stable ICU 2.0 */
+/** Useful constant for this language. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_ITALIAN            "it"
-/** Useful constant for this language. @stable ICU 2.0 */
+/** Useful constant for this language. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_JAPANESE           "ja"
-/** Useful constant for this language. @stable ICU 2.0 */
+/** Useful constant for this language. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_KOREAN             "ko"
-/** Useful constant for this language. @stable ICU 2.0 */
+/** Useful constant for this language. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_SIMPLIFIED_CHINESE "zh_CN"
-/** Useful constant for this language. @stable ICU 2.0 */
+/** Useful constant for this language. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_TRADITIONAL_CHINESE "zh_TW"
 
-/** Useful constant for this country/region. @stable ICU 2.0 */
+/** Useful constant for this country/region. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_CANADA         "en_CA"
-/** Useful constant for this country/region. @stable ICU 2.0 */
+/** Useful constant for this country/region. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_CANADA_FRENCH  "fr_CA"
-/** Useful constant for this country/region. @stable ICU 2.0 */
+/** Useful constant for this country/region. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_CHINA          "zh_CN"
-/** Useful constant for this country/region. @stable ICU 2.0 */
+/** Useful constant for this country/region. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_PRC            "zh_CN"
-/** Useful constant for this country/region. @stable ICU 2.0 */
+/** Useful constant for this country/region. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_FRANCE         "fr_FR"
-/** Useful constant for this country/region. @stable ICU 2.0 */
+/** Useful constant for this country/region. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_GERMANY        "de_DE"
-/** Useful constant for this country/region. @stable ICU 2.0 */
+/** Useful constant for this country/region. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_ITALY          "it_IT"
-/** Useful constant for this country/region. @stable ICU 2.0 */
+/** Useful constant for this country/region. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_JAPAN          "ja_JP"
-/** Useful constant for this country/region. @stable ICU 2.0 */
+/** Useful constant for this country/region. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_KOREA          "ko_KR"
-/** Useful constant for this country/region. @stable ICU 2.0 */
+/** Useful constant for this country/region. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_TAIWAN         "zh_TW"
-/** Useful constant for this country/region. @stable ICU 2.0 */
+/** Useful constant for this country/region. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_UK             "en_GB"
-/** Useful constant for this country/region. @stable ICU 2.0 */
+/** Useful constant for this country/region. \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 #define ULOC_US             "en_US"
 
 /**
  * Useful constant for the maximum size of the language part of a locale ID.
  * (including the terminating NULL).
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 #define ULOC_LANG_CAPACITY 12
 
 /**
  * Useful constant for the maximum size of the country part of a locale ID
  * (including the terminating NULL).
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 #define ULOC_COUNTRY_CAPACITY 4
 /**
  * Useful constant for the maximum size of the whole locale ID
  * (including the terminating NULL and all keywords).
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 #define ULOC_FULLNAME_CAPACITY 157
 
 /**
  * Useful constant for the maximum size of the script part of a locale ID
  * (including the terminating NULL).
- * @stable ICU 2.8
+ * \xrefitem stable "Stable" "Stable List" ICU 2.8
  */
 #define ULOC_SCRIPT_CAPACITY 6
 
 /**
  * Useful constant for the maximum size of keywords in a locale
- * @stable ICU 2.8
+ * \xrefitem stable "Stable" "Stable List" ICU 2.8
  */
 #define ULOC_KEYWORDS_CAPACITY 96
 
 /**
  * Useful constant for the maximum total size of keywords and their values in a locale
- * @stable ICU 2.8
+ * \xrefitem stable "Stable" "Stable List" ICU 2.8
  */
 #define ULOC_KEYWORD_AND_VALUES_CAPACITY 100
 
 /**
  * Invariant character separating keywords from the locale string
- * @stable ICU 2.8
+ * \xrefitem stable "Stable" "Stable List" ICU 2.8
  */
 #define ULOC_KEYWORD_SEPARATOR '@'
 
 /**
   * Unicode code point for '@' separating keywords from the locale string.
   * @see ULOC_KEYWORD_SEPARATOR
-  * @stable ICU 4.6
+  * \xrefitem stable "Stable" "Stable List" ICU 4.6
   */
 #define ULOC_KEYWORD_SEPARATOR_UNICODE 0x40
 
 /**
  * Invariant character for assigning value to a keyword
- * @stable ICU 2.8
+ * \xrefitem stable "Stable" "Stable List" ICU 2.8
  */
 #define ULOC_KEYWORD_ASSIGN '='
 
 /**
   * Unicode code point for '=' for assigning value to a keyword.
   * @see ULOC_KEYWORD_ASSIGN
-  * @stable ICU 4.6 
+  * \xrefitem stable "Stable" "Stable List" ICU 4.6 
   */
 #define ULOC_KEYWORD_ASSIGN_UNICODE 0x3D
 
 /**
  * Invariant character separating keywords
- * @stable ICU 2.8
+ * \xrefitem stable "Stable" "Stable List" ICU 2.8
  */
 #define ULOC_KEYWORD_ITEM_SEPARATOR ';'
 
 /**
   * Unicode code point for ';' separating keywords
   * @see ULOC_KEYWORD_ITEM_SEPARATOR
-  * @stable ICU 4.6
+  * \xrefitem stable "Stable" "Stable List" ICU 4.6
   */
 #define ULOC_KEYWORD_ITEM_SEPARATOR_UNICODE 0x3B
 
@@ -333,35 +335,33 @@
  * from the UCA)
  * The locale is considered supported by ICU if there is a core ICU bundle 
  * for that locale (although it may be empty).
- * @stable ICU 2.1
+ * \xrefitem stable "Stable" "Stable List" ICU 2.1
  */
 typedef enum {
   /** This is locale the data actually comes from 
-   * @stable ICU 2.1
+   * \xrefitem stable "Stable" "Stable List" ICU 2.1
    */
   ULOC_ACTUAL_LOCALE    = 0,
   /** This is the most specific locale supported by ICU 
-   * @stable ICU 2.1
+   * \xrefitem stable "Stable" "Stable List" ICU 2.1
    */
   ULOC_VALID_LOCALE    = 1,
 
 #ifndef U_HIDE_DEPRECATED_API
   /** This is the requested locale
-   *  @deprecated ICU 2.8 
+   *  \xrefitem deprecated "Deprecated" "Deprecated List" ICU 2.8 
    */
   ULOC_REQUESTED_LOCALE = 2,
 
     /**
      * One more than the highest normal ULocDataLocaleType value.
-     * @deprecated ICU 58 The numeric value may change over time, see ICU ticket #12420.
+     * \xrefitem deprecated "Deprecated" "Deprecated List" ICU 58 The numeric value may change over time, see ICU ticket #12420.
      */
     ULOC_DATA_LOCALE_TYPE_LIMIT = 3
 #endif  // U_HIDE_DEPRECATED_API
 } ULocDataLocaleType;
 
 #ifndef U_HIDE_SYSTEM_API
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
-
 /**
  * Gets ICU's default locale.  
  * The returned string is a snapshot in time, and will remain valid
@@ -373,18 +373,16 @@ typedef enum {
  * java.util.Locale#setDefault in java or by reverse JNI.
  *  
  * @return the ICU default locale
- * @system
- * @stable ICU 2.0
+ * \xrefitem system "System" "System List" Do not use unless you know what you are doing.
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI const char* U_EXPORT2
 uloc_getDefault(void) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
+
 
 
 #endif  /* U_HIDE_SYSTEM_API */
-
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets the language code for the specified locale.
@@ -396,7 +394,7 @@ uloc_getDefault(void) __INTRODUCED_IN(31);
  * @param err error information if retrieving the language code failed
  * @return the actual buffer size needed for the language code.  If it's greater 
  * than languageCapacity, the returned language code will be truncated.  
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI int32_t U_EXPORT2
 uloc_getLanguage(const char*    localeID,
@@ -404,9 +402,7 @@ uloc_getLanguage(const char*    localeID,
          int32_t languageCapacity,
          UErrorCode* err) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets the script code for the specified locale.
@@ -418,7 +414,7 @@ uloc_getLanguage(const char*    localeID,
  * @param err error information if retrieving the language code failed
  * @return the actual buffer size needed for the language code.  If it's greater 
  * than scriptCapacity, the returned language code will be truncated.  
- * @stable ICU 2.8
+ * \xrefitem stable "Stable" "Stable List" ICU 2.8
  */
 U_CAPI int32_t U_EXPORT2
 uloc_getScript(const char*    localeID,
@@ -426,9 +422,7 @@ uloc_getScript(const char*    localeID,
          int32_t scriptCapacity,
          UErrorCode* err) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets the  country code for the specified locale.
@@ -440,7 +434,7 @@ uloc_getScript(const char*    localeID,
  * @param err error information if retrieving the country code failed
  * @return the actual buffer size needed for the country code.  If it's greater 
  * than countryCapacity, the returned country code will be truncated.  
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI int32_t U_EXPORT2
 uloc_getCountry(const char*    localeID,
@@ -448,9 +442,7 @@ uloc_getCountry(const char*    localeID,
         int32_t countryCapacity,
         UErrorCode* err) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets the variant code for the specified locale.
@@ -462,7 +454,7 @@ uloc_getCountry(const char*    localeID,
  * @param err error information if retrieving the variant code failed
  * @return the actual buffer size needed for the variant code.  If it's greater 
  * than variantCapacity, the returned variant code will be truncated.  
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI int32_t U_EXPORT2
 uloc_getVariant(const char*    localeID,
@@ -470,10 +462,8 @@ uloc_getVariant(const char*    localeID,
         int32_t variantCapacity,
         UErrorCode* err) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets the full name for the specified locale.
@@ -489,7 +479,7 @@ uloc_getVariant(const char*    localeID,
  * @param err error information if retrieving the full name failed
  * @return the actual buffer size needed for the full name.  If it's greater 
  * than nameCapacity, the returned full name will be truncated.  
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI int32_t U_EXPORT2
 uloc_getName(const char*    localeID,
@@ -497,9 +487,7 @@ uloc_getName(const char*    localeID,
          int32_t nameCapacity,
          UErrorCode* err) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets the full name for the specified locale.
@@ -516,7 +504,7 @@ uloc_getName(const char*    localeID,
  * @param err error information if retrieving the full name failed
  * @return the actual buffer size needed for the full name.  If it's greater 
  * than nameCapacity, the returned full name will be truncated.  
- * @stable ICU 2.8
+ * \xrefitem stable "Stable" "Stable List" ICU 2.8
  */
 U_CAPI int32_t U_EXPORT2
 uloc_canonicalize(const char*    localeID,
@@ -524,40 +512,34 @@ uloc_canonicalize(const char*    localeID,
          int32_t nameCapacity,
          UErrorCode* err) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets the ISO language code for the specified locale.
  *
  * @param localeID the locale to get the ISO language code with
  * @return language the ISO language code for localeID
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI const char* U_EXPORT2
 uloc_getISO3Language(const char* localeID) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets the ISO country code for the specified locale.
  *
  * @param localeID the locale to get the ISO country code with
  * @return country the ISO country code for localeID
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI const char* U_EXPORT2
 uloc_getISO3Country(const char* localeID) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets the language name suitable for display for the specified locale.
@@ -578,7 +560,7 @@ uloc_getISO3Country(const char* localeID) __INTRODUCED_IN(31);
  * @return the actual buffer size needed for the displayable language code. If
  *                 it's greater than languageCapacity, the returned language
  *                 code will be truncated.
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI int32_t U_EXPORT2
 uloc_getDisplayLanguage(const char* locale,
@@ -587,9 +569,7 @@ uloc_getDisplayLanguage(const char* locale,
             int32_t languageCapacity,
             UErrorCode* status) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets the script name suitable for display for the specified locale.
@@ -611,7 +591,7 @@ uloc_getDisplayLanguage(const char* locale,
  * @return the actual buffer size needed for the displayable script code. If
  *                 it's greater than scriptCapacity, the returned displayable
  *                 script code will be truncated.
- * @stable ICU 2.8
+ * \xrefitem stable "Stable" "Stable List" ICU 2.8
  */
 U_CAPI int32_t U_EXPORT2
 uloc_getDisplayScript(const char* locale,
@@ -620,9 +600,7 @@ uloc_getDisplayScript(const char* locale,
             int32_t scriptCapacity,
             UErrorCode* status) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets the country name suitable for display for the specified locale.
@@ -647,7 +625,7 @@ uloc_getDisplayScript(const char* locale,
  * @return the actual buffer size needed for the displayable country code. If
  *                 it's greater than countryCapacity, the returned displayable
  *                 country code will be truncated.
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI int32_t U_EXPORT2
 uloc_getDisplayCountry(const char* locale,
@@ -656,10 +634,8 @@ uloc_getDisplayCountry(const char* locale,
                        int32_t countryCapacity,
                        UErrorCode* status) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets the variant name suitable for display for the specified locale.
@@ -681,7 +657,7 @@ uloc_getDisplayCountry(const char* locale,
  * @return the actual buffer size needed for the displayable variant code. If
  *                 it's greater than variantCapacity, the returned displayable
  *                 variant code will be truncated.
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI int32_t U_EXPORT2
 uloc_getDisplayVariant(const char* locale,
@@ -690,9 +666,7 @@ uloc_getDisplayVariant(const char* locale,
                        int32_t variantCapacity,
                        UErrorCode* status) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets the keyword name suitable for display for the specified locale. E.g:
@@ -734,7 +708,7 @@ uloc_getDisplayVariant(const char* locale,
  *                          resources and the keyword is placed into dest as fallback.
  * @return the actual buffer size needed for the displayable variant code.
  * @see #uloc_openKeywords
- * @stable ICU 2.8
+ * \xrefitem stable "Stable" "Stable List" ICU 2.8
  */
 U_CAPI int32_t U_EXPORT2
 uloc_getDisplayKeyword(const char* keyword,
@@ -743,8 +717,6 @@ uloc_getDisplayKeyword(const char* keyword,
                        int32_t destCapacity,
                        UErrorCode* status) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets the value of the keyword suitable for display for the specified locale.
@@ -766,7 +738,7 @@ uloc_getDisplayKeyword(const char* keyword,
  *                          U_USING_DEFAULT_WARNING indicates that no data was found from the locale
  *                          resources and the value of the keyword is placed into dest as fallback.
  * @return the actual buffer size needed for the displayable variant code.
- * @stable ICU 2.8
+ * \xrefitem stable "Stable" "Stable List" ICU 2.8
  */
 U_CAPI int32_t U_EXPORT2
 uloc_getDisplayKeywordValue(   const char* locale,
@@ -776,8 +748,6 @@ uloc_getDisplayKeywordValue(   const char* locale,
                                int32_t destCapacity,
                                UErrorCode* status) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets the full name suitable for display for the specified locale.
@@ -793,7 +763,7 @@ uloc_getDisplayKeywordValue(   const char* locale,
  * @param err error information if retrieving the displayable name failed
  * @return the actual buffer size needed for the displayable name.  If it's greater 
  * than maxResultSize, the returned displayable name will be truncated.  
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI int32_t U_EXPORT2
 uloc_getDisplayName(const char* localeID,
@@ -802,10 +772,8 @@ uloc_getDisplayName(const char* localeID,
             int32_t maxResultSize,
             UErrorCode* err) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets the specified locale from a list of available locales.
@@ -821,36 +789,34 @@ uloc_getDisplayName(const char* localeID,
  * @param n the specific locale name index of the available locale list;
  *     should not exceed the number returned by uloc_countAvailable.
  * @return a specified locale name of all available locales
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI const char* U_EXPORT2
 uloc_getAvailable(int32_t n) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets the size of the all available locale list.
  *
  * @return the size of the locale list
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI int32_t U_EXPORT2 uloc_countAvailable(void) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
+
 
 /**
  * Types for uloc_getAvailableByType and uloc_countAvailableByType.
  *
- * @stable ICU 65
+ * \xrefitem stable "Stable" "Stable List" ICU 65
  */
 typedef enum ULocAvailableType {
   /**
    * Locales that return data when passed to ICU APIs,
    * but not including legacy or alias locales.
    *
-   * @stable ICU 65
+   * \xrefitem stable "Stable" "Stable List" ICU 65
    */
   ULOC_AVAILABLE_DEFAULT,
 
@@ -868,7 +834,7 @@ typedef enum ULocAvailableType {
    * ULOC_AVAILABLE_DEFAULT. To get both sets at the same time, use
    * ULOC_AVAILABLE_WITH_LEGACY_ALIASES.
    *
-   * @stable ICU 65
+   * \xrefitem stable "Stable" "Stable List" ICU 65
    */
   ULOC_AVAILABLE_ONLY_LEGACY_ALIASES,
 
@@ -876,21 +842,19 @@ typedef enum ULocAvailableType {
    * The union of the locales in ULOC_AVAILABLE_DEFAULT and
    * ULOC_AVAILABLE_ONLY_LEGACY_ALIAS.
    *
-   * @stable ICU 65
+   * \xrefitem stable "Stable" "Stable List" ICU 65
    */
   ULOC_AVAILABLE_WITH_LEGACY_ALIASES,
 
 #ifndef U_HIDE_INTERNAL_API
   /**
-   * @internal
+   * \xrefitem internal "Internal"  "Internal List"  Do not use. This API is for internal use only.
    */
   ULOC_AVAILABLE_COUNT
-#endif
+#endif  /* U_HIDE_INTERNAL_API */
 } ULocAvailableType;
 
 
-
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  *
@@ -901,14 +865,12 @@ typedef enum ULocAvailableType {
  * by ICU-- do not delete them, and do not write through them.  The array is
  * terminated with a null pointer.
  * @return a list of all available language codes
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI const char* const* U_EXPORT2
 uloc_getISOLanguages(void) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  *
@@ -917,19 +879,17 @@ uloc_getISOLanguages(void) __INTRODUCED_IN(31);
  * owned by ICU-- do not delete them, and do not write through them.  The array is
  * terminated with a null pointer.
  * @return a list of all available country codes
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI const char* const* U_EXPORT2
 uloc_getISOCountries(void) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 
 
 
 
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets the full name for the specified locale, like uloc_getName(),
@@ -951,7 +911,7 @@ uloc_getISOCountries(void) __INTRODUCED_IN(31);
  * @param err error information if retrieving the full name failed
  * @return the actual buffer size needed for the full name.  If it's greater 
  * than nameCapacity, the returned full name will be truncated.  
- * @stable ICU 2.8
+ * \xrefitem stable "Stable" "Stable List" ICU 2.8
  */
 U_CAPI int32_t U_EXPORT2
 uloc_getBaseName(const char*    localeID,
@@ -959,9 +919,7 @@ uloc_getBaseName(const char*    localeID,
          int32_t nameCapacity,
          UErrorCode* err) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets an enumeration of keywords for the specified locale. Enumeration
@@ -970,15 +928,13 @@ uloc_getBaseName(const char*    localeID,
  * @param localeID the locale to get the variant code with
  * @param status error information if retrieving the keywords failed
  * @return enumeration of keywords or NULL if there are no keywords.
- * @stable ICU 2.8
+ * \xrefitem stable "Stable" "Stable List" ICU 2.8
  */
 U_CAPI UEnumeration* U_EXPORT2
 uloc_openKeywords(const char* localeID,
                         UErrorCode* status) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get the value for a keyword. Locale name does not need to be normalized.
@@ -991,7 +947,7 @@ uloc_openKeywords(const char* localeID,
  * @param status containing error code: e.g. buffer not big enough or ill-formed localeID
  *  or keywordName parameters.
  * @return the length of keyword value
- * @stable ICU 2.8
+ * \xrefitem stable "Stable" "Stable List" ICU 2.8
  */
 U_CAPI int32_t U_EXPORT2
 uloc_getKeywordValue(const char* localeID,
@@ -999,10 +955,8 @@ uloc_getKeywordValue(const char* localeID,
                      char* buffer, int32_t bufferCapacity,
                      UErrorCode* status) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Sets or removes the value of the specified keyword.
@@ -1032,7 +986,7 @@ uloc_getKeywordValue(const char* localeID,
  *  locale ID in buffer on input.
  * @return the length needed for the buffer
  * @see uloc_getKeywordValue
- * @stable ICU 3.2
+ * \xrefitem stable "Stable" "Stable List" ICU 3.2
  */
 U_CAPI int32_t U_EXPORT2
 uloc_setKeywordValue(const char* keywordName,
@@ -1040,9 +994,7 @@ uloc_setKeywordValue(const char* keywordName,
                      char* buffer, int32_t bufferCapacity,
                      UErrorCode* status) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Returns whether the locale's script is written right-to-left.
@@ -1056,17 +1008,17 @@ uloc_setKeywordValue(const char* keywordName,
  *
  * @param locale input locale ID
  * @return true if the locale's script is written right-to-left
- * @stable ICU 54
+ * \xrefitem stable "Stable" "Stable List" ICU 54
  */
 U_CAPI UBool U_EXPORT2
 uloc_isRightToLeft(const char *locale) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
+
 
 /**
  * enums for the  return value for the character and line orientation
  * functions.
- * @stable ICU 4.0
+ * \xrefitem stable "Stable" "Stable List" ICU 4.0
  */
 typedef enum {
   ULOC_LAYOUT_LTR   = 0,  /* left-to-right. */
@@ -1076,23 +1028,19 @@ typedef enum {
   ULOC_LAYOUT_UNKNOWN
 } ULayoutType;
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
-
 /**
  * Get the layout character orientation for the specified locale.
  * 
  * @param localeId locale name
  * @param status Error status
  * @return an enum indicating the layout orientation for characters.
- * @stable ICU 4.0
+ * \xrefitem stable "Stable" "Stable List" ICU 4.0
  */
 U_CAPI ULayoutType U_EXPORT2
 uloc_getCharacterOrientation(const char* localeId,
                              UErrorCode *status) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get the layout line orientation for the specified locale.
@@ -1100,43 +1048,41 @@ uloc_getCharacterOrientation(const char* localeId,
  * @param localeId locale name
  * @param status Error status
  * @return an enum indicating the layout orientation for lines.
- * @stable ICU 4.0
+ * \xrefitem stable "Stable" "Stable List" ICU 4.0
  */
 U_CAPI ULayoutType U_EXPORT2
 uloc_getLineOrientation(const char* localeId,
                         UErrorCode *status) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
+
 
 /**
  * Output values which uloc_acceptLanguage() writes to the 'outResult' parameter.
  *
  * @see uloc_acceptLanguageFromHTTP
  * @see uloc_acceptLanguage
- * @stable ICU 3.2
+ * \xrefitem stable "Stable" "Stable List" ICU 3.2
  */
 typedef enum {
     /**
      * No exact match was found.
-     * @stable ICU 3.2
+     * \xrefitem stable "Stable" "Stable List" ICU 3.2
      */
     ULOC_ACCEPT_FAILED   = 0,
     /**
      * An exact match was found.
-     * @stable ICU 3.2
+     * \xrefitem stable "Stable" "Stable List" ICU 3.2
      */
     ULOC_ACCEPT_VALID    = 1,
     /**
      * A fallback was found. For example, the Accept-Language list includes 'ja_JP'
      * and is matched with available locale 'ja'.
-     * @stable ICU 3.2
+     * \xrefitem stable "Stable" "Stable List" ICU 3.2
      */
     ULOC_ACCEPT_FALLBACK = 2   /*  */
 } UAcceptResult;
 
 
-
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Based on a list of available locales,
@@ -1154,7 +1100,7 @@ typedef enum {
  *               or else the function returns immediately. Check for U_FAILURE()
  *               on output or use with function chaining. (See User Guide for details.)
  * @return length needed for the locale.
- * @stable ICU 3.2
+ * \xrefitem stable "Stable" "Stable List" ICU 3.2
  */
 U_CAPI int32_t U_EXPORT2
 uloc_acceptLanguage(char *result, int32_t resultAvailable, 
@@ -1163,13 +1109,11 @@ uloc_acceptLanguage(char *result, int32_t resultAvailable,
                     UEnumeration* availableLocales,
                     UErrorCode *status) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 
 
 
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Add the likely subtags for a provided locale ID, per the algorithm described
@@ -1202,7 +1146,7 @@ uloc_acceptLanguage(char *result, int32_t resultAvailable,
  * @return The actual buffer size needed for the maximized locale.  If it's
  * greater than maximizedLocaleIDCapacity, the returned ID will be truncated.
  * On error, the return value is -1.
- * @stable ICU 4.0
+ * \xrefitem stable "Stable" "Stable List" ICU 4.0
  */
 U_CAPI int32_t U_EXPORT2
 uloc_addLikelySubtags(const char*    localeID,
@@ -1210,10 +1154,8 @@ uloc_addLikelySubtags(const char*    localeID,
          int32_t maximizedLocaleIDCapacity,
          UErrorCode* err) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Minimize the subtags for a provided locale ID, per the algorithm described
@@ -1246,7 +1188,7 @@ uloc_addLikelySubtags(const char*    localeID,
  * @return The actual buffer size needed for the minimized locale.  If it's
  * greater than minimizedLocaleIDCapacity, the returned ID will be truncated.
  * On error, the return value is -1.
- * @stable ICU 4.0
+ * \xrefitem stable "Stable" "Stable List" ICU 4.0
  */
 U_CAPI int32_t U_EXPORT2
 uloc_minimizeSubtags(const char*    localeID,
@@ -1254,9 +1196,7 @@ uloc_minimizeSubtags(const char*    localeID,
          int32_t minimizedLocaleIDCapacity,
          UErrorCode* err) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Returns a locale ID for the specified BCP47 language tag string.
@@ -1283,7 +1223,7 @@ uloc_minimizeSubtags(const char*    localeID,
  * @param err       error information if receiving the locald ID
  *                  failed.
  * @return          the length of the locale ID.
- * @stable ICU 4.2
+ * \xrefitem stable "Stable" "Stable List" ICU 4.2
  */
 U_CAPI int32_t U_EXPORT2
 uloc_forLanguageTag(const char* langtag,
@@ -1292,9 +1232,7 @@ uloc_forLanguageTag(const char* langtag,
                     int32_t* parsedLength,
                     UErrorCode* err) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Returns a well-formed language tag for this locale ID. 
@@ -1315,7 +1253,7 @@ uloc_forLanguageTag(const char* langtag,
  * @param err       error information if receiving the language
  *                  tag failed.
  * @return          The length of the BCP47 language tag.
- * @stable ICU 4.2
+ * \xrefitem stable "Stable" "Stable List" ICU 4.2
  */
 U_CAPI int32_t U_EXPORT2
 uloc_toLanguageTag(const char* localeID,
@@ -1324,9 +1262,7 @@ uloc_toLanguageTag(const char* localeID,
                    UBool strict,
                    UErrorCode* err) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Converts the specified keyword (legacy key, or BCP 47 Unicode locale
@@ -1347,14 +1283,12 @@ uloc_toLanguageTag(const char* localeID,
  *                      mapped to a well-formed BCP 47 Unicode locale extension
  *                      key. 
  * @see uloc_toLegacyKey
- * @stable ICU 54
+ * \xrefitem stable "Stable" "Stable List" ICU 54
  */
 U_CAPI const char* U_EXPORT2
 uloc_toUnicodeLocaleKey(const char* keyword) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Converts the specified keyword value (legacy type, or BCP 47
@@ -1382,14 +1316,12 @@ uloc_toUnicodeLocaleKey(const char* keyword) __INTRODUCED_IN(31);
  *                      or NULL if the locale keyword value cannot be mapped to
  *                      a well-formed BCP 47 Unicode locale extension type.
  * @see uloc_toLegacyType
- * @stable ICU 54
+ * \xrefitem stable "Stable" "Stable List" ICU 54
  */
 U_CAPI const char* U_EXPORT2
 uloc_toUnicodeLocaleType(const char* keyword, const char* value) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Converts the specified keyword (BCP 47 Unicode locale extension key, or
@@ -1401,14 +1333,12 @@ uloc_toUnicodeLocaleType(const char* keyword, const char* value) __INTRODUCED_IN
  * @return              the well-formed legacy key, or NULL if the specified
  *                      keyword cannot be mapped to a well-formed legacy key.
  * @see toUnicodeLocaleKey
- * @stable ICU 54
+ * \xrefitem stable "Stable" "Stable List" ICU 54
  */
 U_CAPI const char* U_EXPORT2
 uloc_toLegacyKey(const char* keyword) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Converts the specified keyword value (BCP 47 Unicode locale extension type,
@@ -1434,11 +1364,13 @@ uloc_toLegacyKey(const char* keyword) __INTRODUCED_IN(31);
  *                      keyword value cannot be mapped to a well-formed legacy
  *                      type.
  * @see toUnicodeLocaleType
- * @stable ICU 54
+ * \xrefitem stable "Stable" "Stable List" ICU 54
  */
 U_CAPI const char* U_EXPORT2
 uloc_toLegacyType(const char* keyword, const char* value) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
+
 
 #endif /*_ULOC*/
+
+/** @} */ // addtogroup

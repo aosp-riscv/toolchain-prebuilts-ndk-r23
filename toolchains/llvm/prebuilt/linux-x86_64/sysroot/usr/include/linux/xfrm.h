@@ -35,7 +35,7 @@ struct xfrm_sec_ctx {
   __u8 ctx_alg;
   __u16 ctx_len;
   __u32 ctx_sid;
-  char ctx_str[0];
+  char ctx_str[];
 };
 #define XFRM_SC_DOI_RESERVED 0
 #define XFRM_SC_DOI_LSM 1
@@ -85,24 +85,24 @@ struct xfrm_replay_state_esn {
   __u32 oseq_hi;
   __u32 seq_hi;
   __u32 replay_window;
-  __u32 bmp[0];
+  __u32 bmp[];
 };
 struct xfrm_algo {
   char alg_name[64];
   unsigned int alg_key_len;
-  char alg_key[0];
+  char alg_key[];
 };
 struct xfrm_algo_auth {
   char alg_name[64];
   unsigned int alg_key_len;
   unsigned int alg_trunc_len;
-  char alg_key[0];
+  char alg_key[];
 };
 struct xfrm_algo_aead {
   char alg_name[64];
   unsigned int alg_key_len;
   unsigned int alg_icv_len;
-  char alg_key[0];
+  char alg_key[];
 };
 struct xfrm_stats {
   __u32 replay_window;
@@ -182,6 +182,10 @@ enum {
 #define XFRM_MSG_GETSPDINFO XFRM_MSG_GETSPDINFO
   XFRM_MSG_MAPPING,
 #define XFRM_MSG_MAPPING XFRM_MSG_MAPPING
+  XFRM_MSG_SETDEFAULT,
+#define XFRM_MSG_SETDEFAULT XFRM_MSG_SETDEFAULT
+  XFRM_MSG_GETDEFAULT,
+#define XFRM_MSG_GETDEFAULT XFRM_MSG_GETDEFAULT
   __XFRM_MSG_MAX
 };
 #define XFRM_MSG_MAX (__XFRM_MSG_MAX - 1)
@@ -261,6 +265,7 @@ enum xfrm_attr_type_t {
   XFRMA_SET_MARK,
   XFRMA_SET_MARK_MASK,
   XFRMA_IF_ID,
+  XFRMA_MTIMER_THRESH,
   __XFRMA_MAX
 #define XFRMA_OUTPUT_MARK XFRMA_SET_MARK
 #define XFRMA_MAX (__XFRMA_MAX - 1)
@@ -430,6 +435,14 @@ struct xfrm_user_offload {
 };
 #define XFRM_OFFLOAD_IPV6 1
 #define XFRM_OFFLOAD_INBOUND 2
+struct xfrm_userpolicy_default {
+#define XFRM_USERPOLICY_UNSPEC 0
+#define XFRM_USERPOLICY_BLOCK 1
+#define XFRM_USERPOLICY_ACCEPT 2
+  __u8 in;
+  __u8 fwd;
+  __u8 out;
+};
 #define XFRMGRP_ACQUIRE 1
 #define XFRMGRP_EXPIRE 2
 #define XFRMGRP_SA 4

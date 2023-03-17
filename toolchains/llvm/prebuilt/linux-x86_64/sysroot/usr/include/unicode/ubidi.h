@@ -27,6 +27,8 @@
 #endif   // U_SHOW_CPLUSPLUS_API
 
 /**
+ * @addtogroup ICU4C
+ * @{
  *\file
  * \brief C API: Bidi algorithm
  *
@@ -84,7 +86,7 @@
  *
  * <pre>
  * \code
- *#include "unicode/ubidi.h"
+ *#include <unicode/ubidi.h>
  *
  *typedef enum {
  *     styleNormal=0, styleSelected=1,
@@ -136,11 +138,11 @@
  *         int styleLimit;
  *
  *         for(i=0; i<styleRunCount; ++i) {
- *             styleLimit=styleRun[i].limit;
+ *             styleLimit=styleRuns[i].limit;
  *             if(start<styleLimit) {
  *                 if(styleLimit>limit) { styleLimit=limit; }
  *                 renderRun(text, start, styleLimit,
- *                           direction, styleRun[i].style);
+ *                           direction, styleRuns[i].style);
  *                 if(styleLimit==limit) { break; }
  *                 start=styleLimit;
  *             }
@@ -150,14 +152,14 @@
  *
  *         for(i=styleRunCount-1; i>=0; --i) {
  *             if(i>0) {
- *                 styleStart=styleRun[i-1].limit;
+ *                 styleStart=styleRuns[i-1].limit;
  *             } else {
  *                 styleStart=0;
  *             }
  *             if(limit>=styleStart) {
  *                 if(styleStart<start) { styleStart=start; }
  *                 renderRun(text, styleStart, limit,
- *                           direction, styleRun[i].style);
+ *                           direction, styleRuns[i].style);
  *                 if(styleStart==start) { break; }
  *                 limit=styleStart;
  *             }
@@ -168,7 +170,8 @@
  * // the line object represents text[start..limit-1]
  * void renderLine(UBiDi *line, const UChar *text,
  *                 int32_t start, int32_t limit,
- *                 const StyleRun *styleRuns, int styleRunCount) {
+ *                 const StyleRun *styleRuns, int styleRunCount,
+ *                 UErrorCode *pErrorCode) {
  *     UBiDiDirection direction=ubidi_getDirection(line);
  *     if(direction!=UBIDI_MIXED) {
  *         // unidirectional
@@ -183,14 +186,14 @@
  *         int32_t count, i, length;
  *         UBiDiLevel level;
  *
- *         count=ubidi_countRuns(para, pErrorCode);
+ *         count=ubidi_countRuns(line, pErrorCode);
  *         if(U_SUCCESS(*pErrorCode)) {
  *             if(styleRunCount<=1) {
  *                 Style style=styleRuns[0].style;
  *
  *                 // iterate over directional runs
  *                for(i=0; i<count; ++i) {
- *                    direction=ubidi_getVisualRun(para, i, &start, &length);
+ *                    direction=ubidi_getVisualRun(line, i, &start, &length);
  *                     renderRun(text, start, start+length, direction, style);
  *                }
  *             } else {
@@ -244,7 +247,7 @@
  *             startLine(paraLevel, width);
  *
  *             renderLine(para, text, 0, length,
- *                        styleRuns, styleRunCount);
+ *                        styleRuns, styleRunCount, pErrorCode);
  *         } else {
  *             UBiDi *line;
  *
@@ -268,7 +271,7 @@
  *
  *                         renderLine(line, text, start, limit,
  *                                    styleRuns+styleRunStart,
- *                                    styleRunLimit-styleRunStart);
+ *                                    styleRunLimit-styleRunStart, pErrorCode);
  *                     }
  *                     if(limit==length) { break; }
  *                     start=limit;
@@ -334,7 +337,7 @@
  * @see UBIDI_DEFAULT_RTL
  * @see UBIDI_LEVEL_OVERRIDE
  * @see UBIDI_MAX_EXPLICIT_LEVEL
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 typedef uint8_t UBiDiLevel;
 
@@ -360,7 +363,7 @@ typedef uint8_t UBiDiLevel;
  * the original source text).
  * @see UBIDI_REORDER_INVERSE_LIKE_DIRECT
  * @see UBIDI_REORDER_INVERSE_FOR_NUMBERS_SPECIAL
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 #define UBIDI_DEFAULT_LTR 0xfe
 
@@ -387,7 +390,7 @@ typedef uint8_t UBiDiLevel;
  * the original source text).
  * @see UBIDI_REORDER_INVERSE_LIKE_DIRECT
  * @see UBIDI_REORDER_INVERSE_FOR_NUMBERS_SPECIAL
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 #define UBIDI_DEFAULT_RTL 0xff
 
@@ -396,13 +399,13 @@ typedef uint8_t UBiDiLevel;
  * Same as the max_depth value in the
  * <a href="http://www.unicode.org/reports/tr9/#BD2">Unicode Bidirectional Algorithm</a>.
  * (The maximum resolved level can be up to <code>UBIDI_MAX_EXPLICIT_LEVEL+1</code>).
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 #define UBIDI_MAX_EXPLICIT_LEVEL 125
 
 /** Bit flag for level input.
  *  Overrides directional properties.
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 #define UBIDI_LEVEL_OVERRIDE 0x80
 
@@ -417,13 +420,13 @@ typedef uint8_t UBiDiLevel;
  * @see ubidi_getVisualMap
  * @see ubidi_getLogicalIndex
  * @see ubidi_getLogicalMap
- * @stable ICU 3.6
+ * \xrefitem stable "Stable" "Stable List" ICU 3.6
  */
 #define UBIDI_MAP_NOWHERE   (-1)
 
 /**
  * <code>UBiDiDirection</code> values indicate the text direction.
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 enum UBiDiDirection {
   /** Left-to-right text. This is a 0 value.
@@ -435,7 +438,7 @@ enum UBiDiDirection {
    *      means that the first strong character of the source string has
    *      a left-to-right direction.
    * </ul>
-   * @stable ICU 2.0
+   * \xrefitem stable "Stable" "Stable List" ICU 2.0
    */
   UBIDI_LTR,
   /** Right-to-left text. This is a 1 value.
@@ -447,26 +450,26 @@ enum UBiDiDirection {
    *      means that the first strong character of the source string has
    *      a right-to-left direction.
    * </ul>
-   * @stable ICU 2.0
+   * \xrefitem stable "Stable" "Stable List" ICU 2.0
    */
   UBIDI_RTL,
   /** Mixed-directional text.
    * <p>As return value for <code>ubidi_getDirection()</code>, it means
    *    that the source string contains both left-to-right and
    *    right-to-left characters.
-   * @stable ICU 2.0
+   * \xrefitem stable "Stable" "Stable List" ICU 2.0
    */
   UBIDI_MIXED,
   /** No strongly directional text.
    * <p>As return value for <code>ubidi_getBaseDirection()</code>, it means
    *    that the source string is missing or empty, or contains neither left-to-right
    *    nor right-to-left characters.
-   * @stable ICU 4.6
+   * \xrefitem stable "Stable" "Stable List" ICU 4.6
    */
   UBIDI_NEUTRAL
 };
 
-/** @stable ICU 2.0 */
+/** \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 typedef enum UBiDiDirection UBiDiDirection;
 
 /**
@@ -477,14 +480,12 @@ typedef enum UBiDiDirection UBiDiDirection;
  * such a paragraph.<p>
  * Reordering can be done on a line, or on one or more paragraphs which are
  * then interpreted each as one single line.
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 struct UBiDi;
 
-/** @stable ICU 2.0 */
+/** \xrefitem stable "Stable" "Stable List" ICU 2.0 */
 typedef struct UBiDi UBiDi;
-
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Allocate a <code>UBiDi</code> structure.
@@ -499,14 +500,12 @@ typedef struct UBiDi UBiDi;
  * additional memory for internal structures as necessary.
  *
  * @return An empty <code>UBiDi</code> object.
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI UBiDi * U_EXPORT2
 ubidi_open(void) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Allocate a <code>UBiDi</code> structure with preallocated memory
@@ -540,14 +539,12 @@ ubidi_open(void) __INTRODUCED_IN(31);
  * @param pErrorCode must be a valid pointer to an error code value.
  *
  * @return An empty <code>UBiDi</code> object with preallocated memory.
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI UBiDi * U_EXPORT2
 ubidi_openSized(int32_t maxLength, int32_t maxRunCount, UErrorCode *pErrorCode) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * <code>ubidi_close()</code> must be called to free the memory
@@ -567,12 +564,12 @@ ubidi_openSized(int32_t maxLength, int32_t maxRunCount, UErrorCode *pErrorCode) 
  *
  * @see ubidi_setPara
  * @see ubidi_setLine
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI void U_EXPORT2
 ubidi_close(UBiDi *pBiDi) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
+
 
 #if U_SHOW_CPLUSPLUS_API
 
@@ -585,15 +582,13 @@ U_NAMESPACE_BEGIN
  *
  * @see LocalPointerBase
  * @see LocalPointer
- * @stable ICU 4.4
+ * \xrefitem stable "Stable" "Stable List" ICU 4.4
  */
 U_DEFINE_LOCAL_OPEN_POINTER(LocalUBiDiPointer, UBiDi, ubidi_close);
 
 U_NAMESPACE_END
 
 #endif
-
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Modify the operation of the Bidi algorithm such that it
@@ -641,12 +636,12 @@ U_NAMESPACE_END
  * @see ubidi_setPara
  * @see ubidi_writeReordered
  * @see ubidi_setReorderingMode
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI void U_EXPORT2
 ubidi_setInverse(UBiDi *pBiDi, UBool isInverse) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
+
 
 /**
  * Is this Bidi object set to perform the inverse Bidi algorithm?
@@ -661,13 +656,11 @@ ubidi_setInverse(UBiDi *pBiDi, UBool isInverse) __INTRODUCED_IN(31);
  *
  * @see ubidi_setInverse
  * @see ubidi_setReorderingMode
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 
 U_CAPI UBool U_EXPORT2
 ubidi_isInverse(UBiDi *pBiDi);
-
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Specify whether block separators must be allocated level zero,
@@ -687,14 +680,12 @@ ubidi_isInverse(UBiDi *pBiDi);
  * receive level 0, so that successive paragraphs progress from left to right.
  *
  * @see ubidi_setPara
- * @stable ICU 3.4
+ * \xrefitem stable "Stable" "Stable List" ICU 3.4
  */
 U_CAPI void U_EXPORT2
 ubidi_orderParagraphsLTR(UBiDi *pBiDi, UBool orderParagraphsLTR) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Is this Bidi object set to allocate level 0 to block separators so that
@@ -705,32 +696,32 @@ ubidi_orderParagraphsLTR(UBiDi *pBiDi, UBool orderParagraphsLTR) __INTRODUCED_IN
  *         separators.
  *
  * @see ubidi_orderParagraphsLTR
- * @stable ICU 3.4
+ * \xrefitem stable "Stable" "Stable List" ICU 3.4
  */
 U_CAPI UBool U_EXPORT2
 ubidi_isOrderParagraphsLTR(UBiDi *pBiDi) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
+
 
 /**
  * <code>UBiDiReorderingMode</code> values indicate which variant of the Bidi
  * algorithm to use.
  *
  * @see ubidi_setReorderingMode
- * @stable ICU 3.6
+ * \xrefitem stable "Stable" "Stable List" ICU 3.6
  */
 typedef enum UBiDiReorderingMode {
     /** Regular Logical to Visual Bidi algorithm according to Unicode.
       * This is a 0 value.
-      * @stable ICU 3.6 */
+      * \xrefitem stable "Stable" "Stable List" ICU 3.6 */
     UBIDI_REORDER_DEFAULT = 0,
     /** Logical to Visual algorithm which handles numbers in a way which
       * mimics the behavior of Windows XP.
-      * @stable ICU 3.6 */
+      * \xrefitem stable "Stable" "Stable List" ICU 3.6 */
     UBIDI_REORDER_NUMBERS_SPECIAL,
     /** Logical to Visual algorithm grouping numbers with adjacent R characters
       * (reversible algorithm).
-      * @stable ICU 3.6 */
+      * \xrefitem stable "Stable" "Stable List" ICU 3.6 */
     UBIDI_REORDER_GROUP_NUMBERS_WITH_R,
     /** Reorder runs only to transform a Logical LTR string to the Logical RTL
       * string with the same display, or vice-versa.<br>
@@ -738,31 +729,29 @@ typedef enum UBiDiReorderingMode {
       * <code>#UBIDI_OPTION_INSERT_MARKS</code>, some Bidi controls in the source
       * text may be removed and other controls may be added to produce the
       * minimum combination which has the required display.
-      * @stable ICU 3.6 */
+      * \xrefitem stable "Stable" "Stable List" ICU 3.6 */
     UBIDI_REORDER_RUNS_ONLY,
     /** Visual to Logical algorithm which handles numbers like L
       * (same algorithm as selected by <code>ubidi_setInverse(true)</code>.
       * @see ubidi_setInverse
-      * @stable ICU 3.6 */
+      * \xrefitem stable "Stable" "Stable List" ICU 3.6 */
     UBIDI_REORDER_INVERSE_NUMBERS_AS_L,
     /** Visual to Logical algorithm equivalent to the regular Logical to Visual
       * algorithm.
-      * @stable ICU 3.6 */
+      * \xrefitem stable "Stable" "Stable List" ICU 3.6 */
     UBIDI_REORDER_INVERSE_LIKE_DIRECT,
     /** Inverse Bidi (Visual to Logical) algorithm for the
       * <code>UBIDI_REORDER_NUMBERS_SPECIAL</code> Bidi algorithm.
-      * @stable ICU 3.6 */
+      * \xrefitem stable "Stable" "Stable List" ICU 3.6 */
     UBIDI_REORDER_INVERSE_FOR_NUMBERS_SPECIAL,
 #ifndef U_HIDE_DEPRECATED_API
     /**
      * Number of values for reordering mode.
-     * @deprecated ICU 58 The numeric value may change over time, see ICU ticket #12420.
+     * \xrefitem deprecated "Deprecated" "Deprecated List" ICU 58 The numeric value may change over time, see ICU ticket #12420.
      */
     UBIDI_REORDER_COUNT
 #endif  // U_HIDE_DEPRECATED_API
 } UBiDiReorderingMode;
-
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Modify the operation of the Bidi algorithm such that it implements some
@@ -913,14 +902,12 @@ typedef enum UBiDiReorderingMode {
  * @see ubidi_setInverse
  * @see ubidi_setPara
  * @see ubidi_writeReordered
- * @stable ICU 3.6
+ * \xrefitem stable "Stable" "Stable List" ICU 3.6
  */
 U_CAPI void U_EXPORT2
 ubidi_setReorderingMode(UBiDi *pBiDi, UBiDiReorderingMode reorderingMode) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * What is the requested reordering mode for a given Bidi object?
@@ -928,26 +915,26 @@ ubidi_setReorderingMode(UBiDi *pBiDi, UBiDiReorderingMode reorderingMode) __INTR
  * @param pBiDi is a <code>UBiDi</code> object.
  * @return the current reordering mode of the Bidi object
  * @see ubidi_setReorderingMode
- * @stable ICU 3.6
+ * \xrefitem stable "Stable" "Stable List" ICU 3.6
  */
 U_CAPI UBiDiReorderingMode U_EXPORT2
 ubidi_getReorderingMode(UBiDi *pBiDi) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
+
 
 /**
  * <code>UBiDiReorderingOption</code> values indicate which options are
  * specified to affect the Bidi algorithm.
  *
  * @see ubidi_setReorderingOptions
- * @stable ICU 3.6
+ * \xrefitem stable "Stable" "Stable List" ICU 3.6
  */
 typedef enum UBiDiReorderingOption {
     /**
      * option value for <code>ubidi_setReorderingOptions</code>:
      * disable all the options which can be set with this function
      * @see ubidi_setReorderingOptions
-     * @stable ICU 3.6
+     * \xrefitem stable "Stable" "Stable List" ICU 3.6
      */
     UBIDI_OPTION_DEFAULT = 0,
 
@@ -993,7 +980,7 @@ typedef enum UBiDiReorderingOption {
      *
      * @see ubidi_setReorderingMode
      * @see ubidi_setReorderingOptions
-     * @stable ICU 3.6
+     * \xrefitem stable "Stable" "Stable List" ICU 3.6
      */
     UBIDI_OPTION_INSERT_MARKS = 1,
 
@@ -1011,7 +998,7 @@ typedef enum UBiDiReorderingOption {
      *
      * @see ubidi_setReorderingMode
      * @see ubidi_setReorderingOptions
-     * @stable ICU 3.6
+     * \xrefitem stable "Stable" "Stable List" ICU 3.6
      */
     UBIDI_OPTION_REMOVE_CONTROLS = 2,
 
@@ -1059,12 +1046,10 @@ typedef enum UBiDiReorderingOption {
      * @see ubidi_setReorderingOptions
      * @see ubidi_getProcessedLength
      * @see ubidi_orderParagraphsLTR
-     * @stable ICU 3.6
+     * \xrefitem stable "Stable" "Stable List" ICU 3.6
      */
     UBIDI_OPTION_STREAMING = 4
 } UBiDiReorderingOption;
-
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Specify which of the reordering options
@@ -1077,14 +1062,12 @@ typedef enum UBiDiReorderingOption {
  * <code>#UBIDI_OPTION_REMOVE_CONTROLS</code>, <code>#UBIDI_OPTION_STREAMING</code>.
  *
  * @see ubidi_getReorderingOptions
- * @stable ICU 3.6
+ * \xrefitem stable "Stable" "Stable List" ICU 3.6
  */
 U_CAPI void U_EXPORT2
 ubidi_setReorderingOptions(UBiDi *pBiDi, uint32_t reorderingOptions) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * What are the reordering options applied to a given Bidi object?
@@ -1092,14 +1075,12 @@ ubidi_setReorderingOptions(UBiDi *pBiDi, uint32_t reorderingOptions) __INTRODUCE
  * @param pBiDi is a <code>UBiDi</code> object.
  * @return the current reordering options of the Bidi object
  * @see ubidi_setReorderingOptions
- * @stable ICU 3.6
+ * \xrefitem stable "Stable" "Stable List" ICU 3.6
  */
 U_CAPI uint32_t U_EXPORT2
 ubidi_getReorderingOptions(UBiDi *pBiDi) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Set the context before a call to ubidi_setPara().<p>
@@ -1183,7 +1164,7 @@ ubidi_getReorderingOptions(UBiDi *pBiDi) __INTRODUCED_IN(31);
  * @param pErrorCode must be a valid pointer to an error code value.
  *
  * @see ubidi_setPara
- * @stable ICU 4.8
+ * \xrefitem stable "Stable" "Stable List" ICU 4.8
  */
 U_CAPI void U_EXPORT2
 ubidi_setContext(UBiDi *pBiDi,
@@ -1191,9 +1172,7 @@ ubidi_setContext(UBiDi *pBiDi,
                  const UChar *epilogue, int32_t epiLength,
                  UErrorCode *pErrorCode) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Perform the Unicode Bidi algorithm. It is defined in the
@@ -1275,16 +1254,14 @@ ubidi_setContext(UBiDi *pBiDi,
  *        value is not necessary.
  *
  * @param pErrorCode must be a valid pointer to an error code value.
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI void U_EXPORT2
 ubidi_setPara(UBiDi *pBiDi, const UChar *text, int32_t length,
               UBiDiLevel paraLevel, UBiDiLevel *embeddingLevels,
               UErrorCode *pErrorCode) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * <code>ubidi_setLine()</code> sets a <code>UBiDi</code> to
@@ -1330,7 +1307,7 @@ ubidi_setPara(UBiDi *pBiDi, const UChar *text, int32_t length,
  *
  * @see ubidi_setPara
  * @see ubidi_getProcessedLength
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI void U_EXPORT2
 ubidi_setLine(const UBiDi *pParaBiDi,
@@ -1338,9 +1315,7 @@ ubidi_setLine(const UBiDi *pParaBiDi,
               UBiDi *pLineBiDi,
               UErrorCode *pErrorCode) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get the directionality of the text.
@@ -1355,14 +1330,12 @@ ubidi_setLine(const UBiDi *pParaBiDi,
  * Note -  The value <code>UBIDI_NEUTRAL</code> is never returned from this method.
  *
  * @see UBiDiDirection
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI UBiDiDirection U_EXPORT2
 ubidi_getDirection(const UBiDi *pBiDi) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Gets the base direction of the text provided according
@@ -1389,14 +1362,12 @@ ubidi_getDirection(const UBiDi *pBiDi) __INTRODUCED_IN(31);
  *          <code>UBIDI_NEUTRAL</code>
  *
  * @see UBiDiDirection
- * @stable ICU 4.6
+ * \xrefitem stable "Stable" "Stable List" ICU 4.6
  */
 U_CAPI UBiDiDirection U_EXPORT2
 ubidi_getBaseDirection(const UChar *text,  int32_t length ) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get the pointer to the text.
@@ -1407,14 +1378,12 @@ ubidi_getBaseDirection(const UChar *text,  int32_t length ) __INTRODUCED_IN(31);
  *
  * @see ubidi_setPara
  * @see ubidi_setLine
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI const UChar * U_EXPORT2
 ubidi_getText(const UBiDi *pBiDi) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get the length of the text.
@@ -1422,14 +1391,12 @@ ubidi_getText(const UBiDi *pBiDi) __INTRODUCED_IN(31);
  * @param pBiDi is the paragraph or line <code>UBiDi</code> object.
  *
  * @return The length of the text that the UBiDi object was created for.
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI int32_t U_EXPORT2
 ubidi_getLength(const UBiDi *pBiDi) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get the paragraph level of the text.
@@ -1444,14 +1411,12 @@ ubidi_getLength(const UBiDi *pBiDi) __INTRODUCED_IN(31);
  * @see UBiDiLevel
  * @see ubidi_getParagraph
  * @see ubidi_getParagraphByIndex
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI UBiDiLevel U_EXPORT2
 ubidi_getParaLevel(const UBiDi *pBiDi) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get the number of paragraphs.
@@ -1459,14 +1424,12 @@ ubidi_getParaLevel(const UBiDi *pBiDi) __INTRODUCED_IN(31);
  * @param pBiDi is the paragraph or line <code>UBiDi</code> object.
  *
  * @return The number of paragraphs.
- * @stable ICU 3.4
+ * \xrefitem stable "Stable" "Stable List" ICU 3.4
  */
 U_CAPI int32_t U_EXPORT2
 ubidi_countParagraphs(UBiDi *pBiDi) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get a paragraph, given a position within the text.
@@ -1500,16 +1463,14 @@ ubidi_countParagraphs(UBiDi *pBiDi) __INTRODUCED_IN(31);
  * @return The index of the paragraph containing the specified position.
  *
  * @see ubidi_getProcessedLength
- * @stable ICU 3.4
+ * \xrefitem stable "Stable" "Stable List" ICU 3.4
  */
 U_CAPI int32_t U_EXPORT2
 ubidi_getParagraph(const UBiDi *pBiDi, int32_t charIndex, int32_t *pParaStart,
                    int32_t *pParaLimit, UBiDiLevel *pParaLevel,
                    UErrorCode *pErrorCode) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get a paragraph, given the index of this paragraph.
@@ -1536,16 +1497,14 @@ ubidi_getParagraph(const UBiDi *pBiDi, int32_t charIndex, int32_t *pParaStart,
  *
  * @param pErrorCode must be a valid pointer to an error code value.
  *
- * @stable ICU 3.4
+ * \xrefitem stable "Stable" "Stable List" ICU 3.4
  */
 U_CAPI void U_EXPORT2
 ubidi_getParagraphByIndex(const UBiDi *pBiDi, int32_t paraIndex,
                           int32_t *pParaStart, int32_t *pParaLimit,
                           UBiDiLevel *pParaLevel, UErrorCode *pErrorCode) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get the level for one character.
@@ -1560,14 +1519,12 @@ ubidi_getParagraphByIndex(const UBiDi *pBiDi, int32_t paraIndex,
  *
  * @see UBiDiLevel
  * @see ubidi_getProcessedLength
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI UBiDiLevel U_EXPORT2
 ubidi_getLevelAt(const UBiDi *pBiDi, int32_t charIndex) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get an array of levels for each character.<p>
@@ -1585,14 +1542,12 @@ ubidi_getLevelAt(const UBiDi *pBiDi, int32_t charIndex) __INTRODUCED_IN(31);
  *
  * @see UBiDiLevel
  * @see ubidi_getProcessedLength
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI const UBiDiLevel * U_EXPORT2
 ubidi_getLevels(UBiDi *pBiDi, UErrorCode *pErrorCode) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get a logical run.
@@ -1616,15 +1571,13 @@ ubidi_getLevels(UBiDi *pBiDi, UErrorCode *pErrorCode) __INTRODUCED_IN(31);
  *        value is not necessary.
  *
  * @see ubidi_getProcessedLength
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI void U_EXPORT2
 ubidi_getLogicalRun(const UBiDi *pBiDi, int32_t logicalPosition,
                     int32_t *pLogicalLimit, UBiDiLevel *pLevel) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get the number of runs.
@@ -1639,14 +1592,12 @@ ubidi_getLogicalRun(const UBiDi *pBiDi, int32_t logicalPosition,
  * @param pErrorCode must be a valid pointer to an error code value.
  *
  * @return The number of runs.
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI int32_t U_EXPORT2
 ubidi_countRuns(UBiDi *pBiDi, UErrorCode *pErrorCode) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get one run's logical start, length, and directionality,
@@ -1702,15 +1653,13 @@ ubidi_countRuns(UBiDi *pBiDi, UErrorCode *pErrorCode) __INTRODUCED_IN(31);
  * Use of <code>ubidi_writeReordered()</code>, optionally with the
  * <code>#UBIDI_KEEP_BASE_COMBINING</code> option, can be considered in order
  * to avoid these issues.
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI UBiDiDirection U_EXPORT2
 ubidi_getVisualRun(UBiDi *pBiDi, int32_t runIndex,
                    int32_t *pLogicalStart, int32_t *pLength) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get the visual position from a logical text position.
@@ -1747,14 +1696,12 @@ ubidi_getVisualRun(UBiDi *pBiDi, int32_t runIndex,
  * @see ubidi_getLogicalMap
  * @see ubidi_getLogicalIndex
  * @see ubidi_getProcessedLength
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI int32_t U_EXPORT2
 ubidi_getVisualIndex(UBiDi *pBiDi, int32_t logicalIndex, UErrorCode *pErrorCode) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get the logical text position from a visual position.
@@ -1786,14 +1733,12 @@ ubidi_getVisualIndex(UBiDi *pBiDi, int32_t logicalIndex, UErrorCode *pErrorCode)
  * @see ubidi_getVisualMap
  * @see ubidi_getVisualIndex
  * @see ubidi_getResultLength
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI int32_t U_EXPORT2
 ubidi_getLogicalIndex(UBiDi *pBiDi, int32_t visualIndex, UErrorCode *pErrorCode) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get a logical-to-visual index map (array) for the characters in the UBiDi
@@ -1833,14 +1778,12 @@ ubidi_getLogicalIndex(UBiDi *pBiDi, int32_t visualIndex, UErrorCode *pErrorCode)
  * @see ubidi_getVisualIndex
  * @see ubidi_getProcessedLength
  * @see ubidi_getResultLength
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI void U_EXPORT2
 ubidi_getLogicalMap(UBiDi *pBiDi, int32_t *indexMap, UErrorCode *pErrorCode) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get a visual-to-logical index map (array) for the characters in the UBiDi
@@ -1873,14 +1816,12 @@ ubidi_getLogicalMap(UBiDi *pBiDi, int32_t *indexMap, UErrorCode *pErrorCode) __I
  * @see ubidi_getLogicalIndex
  * @see ubidi_getProcessedLength
  * @see ubidi_getResultLength
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI void U_EXPORT2
 ubidi_getVisualMap(UBiDi *pBiDi, int32_t *indexMap, UErrorCode *pErrorCode) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * This is a convenience function that does not use a UBiDi object.
@@ -1900,14 +1841,12 @@ ubidi_getVisualMap(UBiDi *pBiDi, int32_t *indexMap, UErrorCode *pErrorCode) __IN
  *        indexes which will reflect the reordering of the characters.
  *        The array does not need to be initialized.<p>
  *        The index map will result in <code>indexMap[logicalIndex]==visualIndex</code>.
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI void U_EXPORT2
 ubidi_reorderLogical(const UBiDiLevel *levels, int32_t length, int32_t *indexMap) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * This is a convenience function that does not use a UBiDi object.
@@ -1927,14 +1866,12 @@ ubidi_reorderLogical(const UBiDiLevel *levels, int32_t length, int32_t *indexMap
  *        indexes which will reflect the reordering of the characters.
  *        The array does not need to be initialized.<p>
  *        The index map will result in <code>indexMap[visualIndex]==logicalIndex</code>.
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI void U_EXPORT2
 ubidi_reorderVisual(const UBiDiLevel *levels, int32_t length, int32_t *indexMap) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Invert an index map.
@@ -1966,12 +1903,12 @@ ubidi_reorderVisual(const UBiDiLevel *levels, int32_t length, int32_t *indexMap)
  *
  * @param length is the length of each array.
  * @see UBIDI_MAP_NOWHERE
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI void U_EXPORT2
 ubidi_invertMap(const int32_t *srcMap, int32_t *destMap, int32_t length) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
+
 
 /** option flags for ubidi_writeReordered() */
 
@@ -1980,7 +1917,7 @@ ubidi_invertMap(const int32_t *srcMap, int32_t *destMap, int32_t length) __INTRO
  * keep combining characters after their base characters in RTL runs
  *
  * @see ubidi_writeReordered
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 #define UBIDI_KEEP_BASE_COMBINING       1
 
@@ -1990,7 +1927,7 @@ ubidi_invertMap(const int32_t *srcMap, int32_t *destMap, int32_t length) __INTRO
  * by their mirror-image mappings
  *
  * @see ubidi_writeReordered
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 #define UBIDI_DO_MIRRORING              2
 
@@ -2004,7 +1941,7 @@ ubidi_invertMap(const int32_t *srcMap, int32_t *destMap, int32_t length) __INTRO
  *
  * @see ubidi_setInverse
  * @see ubidi_writeReordered
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 #define UBIDI_INSERT_LRM_FOR_NUMERIC    4
 
@@ -2017,7 +1954,7 @@ ubidi_invertMap(const int32_t *srcMap, int32_t *destMap, int32_t length) __INTRO
  * mappings.</p>
  *
  * @see ubidi_writeReordered
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 #define UBIDI_REMOVE_BIDI_CONTROLS      8
 
@@ -2033,11 +1970,9 @@ ubidi_invertMap(const int32_t *srcMap, int32_t *destMap, int32_t length) __INTRO
  * is designed for RTL scripts and stores text in reverse order.</p>
  *
  * @see ubidi_writeReordered
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 #define UBIDI_OUTPUT_REVERSE            16
-
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get the length of the source text processed by the last call to
@@ -2075,14 +2010,12 @@ ubidi_invertMap(const int32_t *srcMap, int32_t *destMap, int32_t length) __INTRO
  *         the last call to <code>ubidi_setPara</code>.
  * @see ubidi_setPara
  * @see UBIDI_OPTION_STREAMING
- * @stable ICU 3.6
+ * \xrefitem stable "Stable" "Stable List" ICU 3.6
  */
 U_CAPI int32_t U_EXPORT2
 ubidi_getProcessedLength(const UBiDi *pBiDi) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get the length of the reordered text resulting from the last call to
@@ -2109,12 +2042,12 @@ ubidi_getProcessedLength(const UBiDi *pBiDi) __INTRODUCED_IN(31);
  * @see ubidi_setPara
  * @see UBIDI_OPTION_INSERT_MARKS
  * @see UBIDI_OPTION_REMOVE_CONTROLS
- * @stable ICU 3.6
+ * \xrefitem stable "Stable" "Stable List" ICU 3.6
  */
 U_CAPI int32_t U_EXPORT2
 ubidi_getResultLength(const UBiDi *pBiDi) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
+
 
 U_CDECL_BEGIN
 
@@ -2126,7 +2059,7 @@ U_CDECL_BEGIN
  * This constant is deprecated; use u_getIntPropertyMaxValue(UCHAR_BIDI_CLASS)+1 instead.
  *
  * @see UBiDiClassCallback
- * @deprecated ICU 58 The numeric value may change over time, see ICU ticket #12420.
+ * \xrefitem deprecated "Deprecated" "Deprecated List" ICU 58 The numeric value may change over time, see ICU ticket #12420.
  */
 #define U_BIDI_CLASS_DEFAULT  U_CHAR_DIRECTION_COUNT
 #endif  // U_HIDE_DEPRECATED_API
@@ -2149,14 +2082,12 @@ U_CDECL_BEGIN
  *         if the standard Bidi class value for <code>c</code> is to be used.
  * @see ubidi_setClassCallback
  * @see ubidi_getClassCallback
- * @stable ICU 3.6
+ * \xrefitem stable "Stable" "Stable List" ICU 3.6
  */
 typedef UCharDirection U_CALLCONV
 UBiDiClassCallback(const void *context, UChar32 c);
 
 U_CDECL_END
-
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Retrieve the Bidi class for a given code point.
@@ -2171,14 +2102,12 @@ U_CDECL_END
  * @return The Bidi class for character <code>c</code> based
  *         on the given <code>pBiDi</code> instance.
  * @see UBiDiClassCallback
- * @stable ICU 3.6
+ * \xrefitem stable "Stable" "Stable List" ICU 3.6
  */
 U_CAPI UCharDirection U_EXPORT2
 ubidi_getCustomizedClass(UBiDi *pBiDi, UChar32 c) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Set the callback function and callback data used by the UBA
@@ -2205,16 +2134,14 @@ ubidi_getCustomizedClass(UBiDi *pBiDi, UChar32 c) __INTRODUCED_IN(31);
  * @param pErrorCode must be a valid pointer to an error code value.
  *
  * @see ubidi_getClassCallback
- * @stable ICU 3.6
+ * \xrefitem stable "Stable" "Stable List" ICU 3.6
  */
 U_CAPI void U_EXPORT2
 ubidi_setClassCallback(UBiDi *pBiDi, UBiDiClassCallback *newFn,
                        const void *newContext, UBiDiClassCallback **oldFn,
                        const void **oldContext, UErrorCode *pErrorCode) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Get the current callback function used for Bidi class determination.
@@ -2226,14 +2153,12 @@ ubidi_setClassCallback(UBiDi *pBiDi, UBiDiClassCallback *newFn,
  * @param context fillin: Returns the callback's private context.
  *
  * @see ubidi_setClassCallback
- * @stable ICU 3.6
+ * \xrefitem stable "Stable" "Stable List" ICU 3.6
  */
 U_CAPI void U_EXPORT2
 ubidi_getClassCallback(UBiDi *pBiDi, UBiDiClassCallback **fn, const void **context) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Take a <code>UBiDi</code> object containing the reordering
@@ -2298,7 +2223,7 @@ ubidi_getClassCallback(UBiDi *pBiDi, UBiDiClassCallback **fn, const void **conte
  * @return The length of the output string.
  *
  * @see ubidi_getProcessedLength
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI int32_t U_EXPORT2
 ubidi_writeReordered(UBiDi *pBiDi,
@@ -2306,9 +2231,7 @@ ubidi_writeReordered(UBiDi *pBiDi,
                      uint16_t options,
                      UErrorCode *pErrorCode) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
-#if !defined(__ANDROID__) || __ANDROID_API__ >= 31
 
 /**
  * Reverse a Right-To-Left run of Unicode text.
@@ -2354,7 +2277,7 @@ ubidi_writeReordered(UBiDi *pBiDi,
  * @param pErrorCode must be a valid pointer to an error code value.
  *
  * @return The length of the output string.
- * @stable ICU 2.0
+ * \xrefitem stable "Stable" "Stable List" ICU 2.0
  */
 U_CAPI int32_t U_EXPORT2
 ubidi_writeReverse(const UChar *src, int32_t srcLength,
@@ -2362,9 +2285,11 @@ ubidi_writeReverse(const UChar *src, int32_t srcLength,
                    uint16_t options,
                    UErrorCode *pErrorCode) __INTRODUCED_IN(31);
 
-#endif // !defined(__ANDROID__) || __ANDROID_API__ >= 31
+
 
 /*#define BIDI_SAMPLE_CODE*/
 /*@}*/
 
 #endif
+
+/** @} */ // addtogroup

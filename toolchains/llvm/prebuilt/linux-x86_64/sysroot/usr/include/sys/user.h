@@ -26,8 +26,7 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYS_USER_H_
-#define _SYS_USER_H_
+#pragma once
 
 #include <sys/cdefs.h>
 #include <stddef.h> /* For size_t. */
@@ -233,17 +232,10 @@ struct user_fpsimd_struct {
   uint32_t fpcr;
 };
 
-#elif __riscv_xlen == 64
-struct user_gregs_struct {
-  uint64_t regs[32];
-  uint64_t pc;
-  uint64_t psr;
-};
+#elif defined(__riscv)
 
-struct user_fpregs_struct {
-  __uint128_t vregs[32];
-  uint32_t fpsr;
-};
+// This space deliberately left blank for now.
+// No other libcs have any riscv64-specific structs.
 
 #else
 
@@ -252,5 +244,3 @@ struct user_fpregs_struct {
 #endif
 
 __END_DECLS
-
-#endif  /* _SYS_USER_H_ */

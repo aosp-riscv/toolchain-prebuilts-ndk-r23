@@ -18,7 +18,7 @@
  ****************************************************************************/
 #ifndef _UAPI__LINUX_NETLINK_H
 #define _UAPI__LINUX_NETLINK_H
-#include <linux/kernel.h>
+#include <linux/const.h>
 #include <linux/socket.h>
 #include <linux/types.h>
 #define NETLINK_ROUTE 0
@@ -73,6 +73,7 @@ struct nlmsghdr {
 #define NLM_F_CREATE 0x400
 #define NLM_F_APPEND 0x800
 #define NLM_F_NONREC 0x100
+#define NLM_F_BULK 0x200
 #define NLM_F_CAPPED 0x100
 #define NLM_F_ACK_TLVS 0x200
 #define NLMSG_ALIGNTO 4U
@@ -80,7 +81,7 @@ struct nlmsghdr {
 #define NLMSG_HDRLEN ((int) NLMSG_ALIGN(sizeof(struct nlmsghdr)))
 #define NLMSG_LENGTH(len) ((len) + NLMSG_HDRLEN)
 #define NLMSG_SPACE(len) NLMSG_ALIGN(NLMSG_LENGTH(len))
-#define NLMSG_DATA(nlh) ((void *) (((char *) nlh) + NLMSG_LENGTH(0)))
+#define NLMSG_DATA(nlh) ((void *) (((char *) nlh) + NLMSG_HDRLEN))
 #define NLMSG_NEXT(nlh,len) ((len) -= NLMSG_ALIGN((nlh)->nlmsg_len), (struct nlmsghdr *) (((char *) (nlh)) + NLMSG_ALIGN((nlh)->nlmsg_len)))
 #define NLMSG_OK(nlh,len) ((len) >= (int) sizeof(struct nlmsghdr) && (nlh)->nlmsg_len >= sizeof(struct nlmsghdr) && (nlh)->nlmsg_len <= (len))
 #define NLMSG_PAYLOAD(nlh,len) ((nlh)->nlmsg_len - NLMSG_SPACE((len)))
@@ -99,6 +100,8 @@ enum nlmsgerr_attrs {
   NLMSGERR_ATTR_OFFS,
   NLMSGERR_ATTR_COOKIE,
   NLMSGERR_ATTR_POLICY,
+  NLMSGERR_ATTR_MISS_TYPE,
+  NLMSGERR_ATTR_MISS_NEST,
   __NLMSGERR_ATTR_MAX,
   NLMSGERR_ATTR_MAX = __NLMSGERR_ATTR_MAX - 1
 };

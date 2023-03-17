@@ -40,7 +40,7 @@ __BEGIN_DECLS
  * Returns a pointer to the allocated memory on success and returns a null
  * pointer and sets `errno` on failure.
  */
-void* malloc(size_t __byte_count) __mallocfunc __BIONIC_ALLOC_SIZE(1) __wur;
+void* _Nullable malloc(size_t __byte_count) __mallocfunc __BIONIC_ALLOC_SIZE(1) __wur;
 
 /**
  * [calloc(3)](http://man7.org/linux/man-pages/man3/calloc.3.html) allocates
@@ -49,7 +49,7 @@ void* malloc(size_t __byte_count) __mallocfunc __BIONIC_ALLOC_SIZE(1) __wur;
  * Returns a pointer to the allocated memory on success and returns a null
  * pointer and sets `errno` on failure.
  */
-void* calloc(size_t __item_count, size_t __item_size) __mallocfunc __BIONIC_ALLOC_SIZE(1,2) __wur;
+void* _Nullable calloc(size_t __item_count, size_t __item_size) __mallocfunc __BIONIC_ALLOC_SIZE(1,2) __wur;
 
 /**
  * [realloc(3)](http://man7.org/linux/man-pages/man3/realloc.3.html) resizes
@@ -58,7 +58,7 @@ void* calloc(size_t __item_count, size_t __item_size) __mallocfunc __BIONIC_ALLO
  * Returns a pointer (which may be different from `__ptr`) to the resized
  * memory on success and returns a null pointer and sets `errno` on failure.
  */
-void* realloc(void* __ptr, size_t __byte_count) __BIONIC_ALLOC_SIZE(2) __wur;
+void* _Nullable realloc(void* _Nullable __ptr, size_t __byte_count) __BIONIC_ALLOC_SIZE(2) __wur;
 
 /**
  * [reallocarray(3)](http://man7.org/linux/man-pages/man3/realloc.3.html) resizes
@@ -72,7 +72,7 @@ void* realloc(void* __ptr, size_t __byte_count) __BIONIC_ALLOC_SIZE(2) __wur;
  */
 
 #if __ANDROID_API__ >= 29
-void* reallocarray(void* __ptr, size_t __item_count, size_t __item_size) __BIONIC_ALLOC_SIZE(2, 3) __wur __INTRODUCED_IN(29);
+void* _Nullable reallocarray(void* _Nullable __ptr, size_t __item_count, size_t __item_size) __BIONIC_ALLOC_SIZE(2, 3) __wur __INTRODUCED_IN(29);
 #endif /* __ANDROID_API__ >= 29 */
 
 
@@ -80,7 +80,7 @@ void* reallocarray(void* __ptr, size_t __item_count, size_t __item_size) __BIONI
  * [free(3)](http://man7.org/linux/man-pages/man3/free.3.html) deallocates
  * memory on the heap.
  */
-void free(void* __ptr);
+void free(void* _Nullable __ptr);
 
 /**
  * [memalign(3)](http://man7.org/linux/man-pages/man3/memalign.3.html) allocates
@@ -91,7 +91,7 @@ void free(void* __ptr);
  *
  * See also posix_memalign().
  */
-void* memalign(size_t __alignment, size_t __byte_count) __mallocfunc __BIONIC_ALLOC_SIZE(2) __wur;
+void* _Nullable memalign(size_t __alignment, size_t __byte_count) __mallocfunc __BIONIC_ALLOC_SIZE(2) __wur;
 
 /**
  * [malloc_usable_size(3)](http://man7.org/linux/man-pages/man3/malloc_usable_size.3.html)
@@ -101,34 +101,35 @@ void* memalign(size_t __alignment, size_t __byte_count) __mallocfunc __BIONIC_AL
  */
 
 #if __ANDROID_API__ >= 17
-size_t malloc_usable_size(const void* __ptr) __INTRODUCED_IN(17);
+size_t malloc_usable_size(const void* _Nullable __ptr) __INTRODUCED_IN(17);
 #endif /* __ANDROID_API__ >= 17 */
 
 
+#define __MALLINFO_BODY \
+  /** Total number of non-mmapped bytes currently allocated from OS. */ \
+  size_t arena; \
+  /** Number of free chunks. */ \
+  size_t ordblks; \
+  /** (Unused.) */ \
+  size_t smblks; \
+  /** (Unused.) */ \
+  size_t hblks; \
+  /** Total number of bytes in mmapped regions. */ \
+  size_t hblkhd; \
+  /** Maximum total allocated space; greater than total if trimming has occurred. */ \
+  size_t usmblks; \
+  /** (Unused.) */ \
+  size_t fsmblks; \
+  /** Total allocated space (normal or mmapped.) */ \
+  size_t uordblks; \
+  /** Total free space. */ \
+  size_t fordblks; \
+  /** Upper bound on number of bytes releasable by a trim operation. */ \
+  size_t keepcost;
+
 #ifndef STRUCT_MALLINFO_DECLARED
 #define STRUCT_MALLINFO_DECLARED 1
-struct mallinfo {
-  /** Total number of non-mmapped bytes currently allocated from OS. */
-  size_t arena;
-  /** Number of free chunks. */
-  size_t ordblks;
-  /** (Unused.) */
-  size_t smblks;
-  /** (Unused.) */
-  size_t hblks;
-  /** Total number of bytes in mmapped regions. */
-  size_t hblkhd;
-  /** Maximum total allocated space; greater than total if trimming has occurred. */
-  size_t usmblks;
-  /** (Unused.) */
-  size_t fsmblks;
-  /** Total allocated space (normal or mmapped.) */
-  size_t uordblks;
-  /** Total free space. */
-  size_t fordblks;
-  /** Upper bound on number of bytes releasable by a trim operation. */
-  size_t keepcost;
-};
+struct mallinfo { __MALLINFO_BODY };
 #endif
 
 /**
@@ -137,6 +138,18 @@ struct mallinfo {
  * inherently unreliable and consider using malloc_info() instead.
  */
 struct mallinfo mallinfo(void);
+
+/**
+ * On Android the struct mallinfo and struct mallinfo2 are the same.
+ */
+struct mallinfo2 { __MALLINFO_BODY };
+
+/**
+ * [mallinfo2(3)](http://man7.org/linux/man-pages/man3/mallinfo2.3.html) returns
+ * information about the current state of the heap. Note that mallinfo2() is
+ * inherently unreliable and consider using malloc_info() instead.
+ */
+struct mallinfo2 mallinfo2(void) __RENAME(mallinfo);
 
 /**
  * [malloc_info(3)](http://man7.org/linux/man-pages/man3/malloc_info.3.html)
@@ -165,7 +178,7 @@ struct mallinfo mallinfo(void);
  */
 
 #if __ANDROID_API__ >= 23
-int malloc_info(int __must_be_zero, FILE* __fp) __INTRODUCED_IN(23);
+int malloc_info(int __must_be_zero, FILE* _Nonnull __fp) __INTRODUCED_IN(23);
 #endif /* __ANDROID_API__ >= 23 */
 
 
@@ -182,7 +195,45 @@ int malloc_info(int __must_be_zero, FILE* __fp) __INTRODUCED_IN(23);
  * Available since API level 28.
  */
 #define M_PURGE (-101)
-/*
+
+
+/**
+ * mallopt() option to tune the allocator's choice of memory tags to
+ * make it more likely that a certain class of memory errors will be
+ * detected. This is only relevant if MTE is enabled in this process
+ * and ignored otherwise. The value argument should be one of the
+ * M_MEMTAG_TUNING_* flags.
+ * NOTE: This is only available in scudo.
+ *
+ * Available since API level 31.
+ */
+#define M_MEMTAG_TUNING (-102)
+
+/**
+ * When passed as a value of M_MEMTAG_TUNING mallopt() call, enables
+ * deterministic detection of linear buffer overflow and underflow
+ * bugs by assigning distinct tag values to adjacent allocations. This
+ * mode has a slightly reduced chance to detect use-after-free bugs
+ * because only half of the possible tag values are available for each
+ * memory location.
+ *
+ * Please keep in mind that MTE can not detect overflow within the
+ * same tag granule (16-byte aligned chunk), and can miss small
+ * overflows even in this mode. Such overflow can not be the cause of
+ * a memory corruption, because the memory within one granule is never
+ * used for multiple allocations.
+ */
+#define M_MEMTAG_TUNING_BUFFER_OVERFLOW 0
+
+/**
+ * When passed as a value of M_MEMTAG_TUNING mallopt() call, enables
+ * independently randomized tags for uniform ~93% probability of
+ * detecting both spatial (buffer overflow) and temporal (use after
+ * free) bugs.
+ */
+#define M_MEMTAG_TUNING_UAF 1
+
+/**
  * mallopt() option for per-thread memory initialization tuning.
  * The value argument should be one of:
  * 1: Disable automatic heap initialization and, where possible, memory tagging,
@@ -222,7 +273,7 @@ int malloc_info(int __must_be_zero, FILE* __fp) __INTRODUCED_IN(23);
  * should not be zero-initialized, any other value indicates to initialize heap
  * memory to zero.
  *
- * Note that this memory mitigations is only implemented in scudo and therefore
+ * Note that this memory mitigation is only implemented in scudo and therefore
  * this will have no effect when using another allocator (such as jemalloc on
  * Android Go devices).
  *
@@ -234,6 +285,7 @@ int malloc_info(int __must_be_zero, FILE* __fp) __INTRODUCED_IN(23);
  * mallopt() option to change the heap tagging state. May be called at any
  * time, including when multiple threads are running.
  * The value must be one of the M_HEAP_TAGGING_LEVEL_ constants.
+ * NOTE: This is only available in scudo.
  *
  * Available since API level 31.
  */
@@ -295,7 +347,7 @@ int mallopt(int __option, int __value) __INTRODUCED_IN(26);
  */
 
 #if __ANDROID_API__ >= 28
-extern void* (*volatile __malloc_hook)(size_t __byte_count, const void* __caller) __INTRODUCED_IN(28);
+extern void* _Nonnull (*volatile _Nonnull __malloc_hook)(size_t __byte_count, const void* _Nonnull __caller) __INTRODUCED_IN(28);
 
 /**
  * [__realloc_hook(3)](http://man7.org/linux/man-pages/man3/__realloc_hook.3.html)
@@ -306,7 +358,7 @@ extern void* (*volatile __malloc_hook)(size_t __byte_count, const void* __caller
  *
  * See also: [extra documentation](https://android.googlesource.com/platform/bionic/+/master/libc/malloc_hooks/README.md)
  */
-extern void* (*volatile __realloc_hook)(void* __ptr, size_t __byte_count, const void* __caller) __INTRODUCED_IN(28);
+extern void* _Nonnull (*volatile _Nonnull __realloc_hook)(void* _Nullable __ptr, size_t __byte_count, const void* _Nonnull __caller) __INTRODUCED_IN(28);
 
 /**
  * [__free_hook(3)](http://man7.org/linux/man-pages/man3/__free_hook.3.html)
@@ -317,7 +369,7 @@ extern void* (*volatile __realloc_hook)(void* __ptr, size_t __byte_count, const 
  *
  * See also: [extra documentation](https://android.googlesource.com/platform/bionic/+/master/libc/malloc_hooks/README.md)
  */
-extern void (*volatile __free_hook)(void* __ptr, const void* __caller) __INTRODUCED_IN(28);
+extern void (*volatile _Nonnull __free_hook)(void* _Nullable __ptr, const void* _Nonnull __caller) __INTRODUCED_IN(28);
 
 /**
  * [__memalign_hook(3)](http://man7.org/linux/man-pages/man3/__memalign_hook.3.html)
@@ -328,7 +380,7 @@ extern void (*volatile __free_hook)(void* __ptr, const void* __caller) __INTRODU
  *
  * See also: [extra documentation](https://android.googlesource.com/platform/bionic/+/master/libc/malloc_hooks/README.md)
  */
-extern void* (*volatile __memalign_hook)(size_t __alignment, size_t __byte_count, const void* __caller) __INTRODUCED_IN(28);
+extern void* _Nonnull (*volatile _Nonnull __memalign_hook)(size_t __alignment, size_t __byte_count, const void* _Nonnull __caller) __INTRODUCED_IN(28);
 #endif /* __ANDROID_API__ >= 28 */
 
 

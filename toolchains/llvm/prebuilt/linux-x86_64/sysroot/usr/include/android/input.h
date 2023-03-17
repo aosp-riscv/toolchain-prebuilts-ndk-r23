@@ -54,7 +54,14 @@
 #include <stdint.h>
 #include <sys/types.h>
 #include <android/keycodes.h>
+
+// This file is included by modules that have host support but android/looper.h is not supported
+// on host. __REMOVED_IN needs to be defined in order for android/looper.h to be compiled.
+#ifndef __BIONIC__
+#define __REMOVED_IN(x) __attribute__((deprecated))
+#endif
 #include <android/looper.h>
+
 #include <jni.h>
 
 #if !defined(__INTRODUCED_IN)
@@ -166,6 +173,12 @@ enum {
 
     /** Capture event */
     AINPUT_EVENT_TYPE_CAPTURE = 4,
+
+    /** Drag event */
+    AINPUT_EVENT_TYPE_DRAG = 5,
+
+    /** TouchMode event */
+    AINPUT_EVENT_TYPE_TOUCH_MODE = 6,
 };
 
 /**
@@ -675,7 +688,7 @@ enum {
     /**
      * Axis constant: The movement of y position of a motion event.
      *
-     * Same as {@link RELATIVE_X}, but for y position.
+     * Same as {@link AMOTION_EVENT_AXIS_RELATIVE_X}, but for y position.
      */
     AMOTION_EVENT_AXIS_RELATIVE_Y = 28,
     /**
@@ -758,9 +771,46 @@ enum {
      * The interpretation of a generic axis is device-specific.
      */
     AMOTION_EVENT_AXIS_GENERIC_16 = 47,
+    /**
+     * Axis constant: X gesture offset axis of a motion event.
+     *
+     * - For a touch pad, reports the distance that a swipe gesture has moved in the X axis, as a
+     *   proportion of the touch pad's size. For example, if a touch pad is 1000 units wide, and a
+     *   swipe gesture starts at X = 500 then moves to X = 400, this axis would have a value of
+     *   -0.1.
+     */
+    AMOTION_EVENT_AXIS_GESTURE_X_OFFSET = 48,
+    /**
+     * Axis constant: Y gesture offset axis of a motion event.
+     *
+     * The same as {@link AMOTION_EVENT_AXIS_GESTURE_X_OFFSET}, but for the Y axis.
+     */
+    AMOTION_EVENT_AXIS_GESTURE_Y_OFFSET = 49,
+    /**
+     * Axis constant: X scroll distance axis of a motion event.
+     *
+     * - For a touch pad, reports the distance that should be scrolled in the X axis as a result of
+     *   the user's two-finger scroll gesture, in display pixels.
+     */
+    AMOTION_EVENT_AXIS_GESTURE_SCROLL_X_DISTANCE = 50,
+    /**
+     * Axis constant: Y scroll distance axis of a motion event.
+     *
+     * The same as {@link AMOTION_EVENT_AXIS_GESTURE_SCROLL_X_DISTANCE}, but for the Y axis.
+     */
+    AMOTION_EVENT_AXIS_GESTURE_SCROLL_Y_DISTANCE = 51,
+
+    /**
+     * Note: This is not an "Axis constant". It does not represent any axis, nor should it be used
+     * to represent any axis. It is a constant holding the value of the largest defined axis value,
+     * to make some computations (like iterating through all possible axes) cleaner.
+     * Please update the value accordingly if you add a new axis.
+     */
+    AMOTION_EVENT_MAXIMUM_VALID_AXIS_VALUE = AMOTION_EVENT_AXIS_GESTURE_SCROLL_Y_DISTANCE,
 
     // NOTE: If you add a new axis here you must also add it to several other files.
     //       Refer to frameworks/base/core/java/android/view/MotionEvent.java for the full list.
+    //       Update AMOTION_EVENT_MAXIMUM_VALID_AXIS_VALUE accordingly as well.
 };
 
 /**
@@ -799,6 +849,48 @@ enum {
     AMOTION_EVENT_TOOL_TYPE_ERASER = 4,
     /** palm */
     AMOTION_EVENT_TOOL_TYPE_PALM = 5,
+};
+
+/**
+ * Constants that identify different gesture classification types.
+ */
+enum AMotionClassification : uint32_t {
+    /**
+     * Classification constant: None.
+     *
+     * No additional information is available about the current motion event stream.
+     */
+    AMOTION_EVENT_CLASSIFICATION_NONE = 0,
+    /**
+     * Classification constant: Ambiguous gesture.
+     *
+     * The user's intent with respect to the current event stream is not yet determined. Events
+     * starting in AMBIGUOUS_GESTURE will eventually resolve into either DEEP_PRESS or NONE.
+     * Gestural actions, such as scrolling, should be inhibited until the classification resolves
+     * to another value or the event stream ends.
+     */
+    AMOTION_EVENT_CLASSIFICATION_AMBIGUOUS_GESTURE = 1,
+    /**
+     * Classification constant: Deep press.
+     *
+     * The current event stream represents the user intentionally pressing harder on the screen.
+     * This classification type should be used to accelerate the long press behaviour.
+     */
+    AMOTION_EVENT_CLASSIFICATION_DEEP_PRESS = 2,
+    /**
+     * Classification constant: touchpad two-finger swipe.
+     *
+     * The current event stream represents the user swiping with two fingers on a touchpad.
+     */
+    AMOTION_EVENT_CLASSIFICATION_TWO_FINGER_SWIPE = 3,
+    /**
+     * Classification constant: multi-finger swipe.
+     *
+     * The current event stream represents the user swiping with three or more fingers on a
+     * touchpad. Unlike two-finger swipes, these are only to be handled by the system UI, which is
+     * why they have a separate constant from two-finger swipes.
+     */
+    AMOTION_EVENT_CLASSIFICATION_MULTI_FINGER_SWIPE = 4,
 };
 
 /**
@@ -859,7 +951,7 @@ enum {
     /** HDMI */
     AINPUT_SOURCE_HDMI = 0x02000000 | AINPUT_SOURCE_CLASS_BUTTON,
     /** sensor */
-    AINPUT_SOURCE_SENSOR = 0x04000000 | AINPUT_SOURCE_UNKNOWN,
+    AINPUT_SOURCE_SENSOR = 0x04000000 | AINPUT_SOURCE_CLASS_NONE,
     /** rotary encoder */
     AINPUT_SOURCE_ROTARY_ENCODER = 0x00400000 | AINPUT_SOURCE_CLASS_NONE,
 
@@ -871,6 +963,7 @@ enum {
  * Keyboard types.
  *
  * Refer to the documentation on android.view.InputDevice for more details.
+ * Note: When adding a new keyboard type here InputDeviceInfo::setKeyboardType needs to be updated.
  */
 enum {
     /** none */
@@ -944,9 +1037,10 @@ int32_t AInputEvent_getSource(const AInputEvent* event);
  * and {@link AMotionEvent_fromJava()}.
  * After returning, the specified AInputEvent* object becomes invalid and should no longer be used.
  * The underlying Java object remains valid and does not change its state.
+ *
+ * Available since API level 31.
  */
-
-void AInputEvent_release(const AInputEvent* event);
+void AInputEvent_release(const AInputEvent* event) __INTRODUCED_IN(31);
 
 /*** Accessors for key events only. ***/
 
@@ -998,8 +1092,10 @@ int64_t AKeyEvent_getEventTime(const AInputEvent* key_event);
  * Creates a native AInputEvent* object that is a copy of the specified Java android.view.KeyEvent.
  * The result may be used with generic and KeyEvent-specific AInputEvent_* functions. The object
  * returned by this function must be disposed using {@link AInputEvent_release()}.
+ *
+ * Available since API level 31.
  */
-const AInputEvent* AKeyEvent_fromJava(JNIEnv* env, jobject keyEvent);
+const AInputEvent* AKeyEvent_fromJava(JNIEnv* env, jobject keyEvent) __INTRODUCED_IN(31);
 
 /*** Accessors for motion events only. ***/
 
@@ -1317,12 +1413,41 @@ float AMotionEvent_getHistoricalAxisValue(const AInputEvent* motion_event,
         int32_t axis, size_t pointer_index, size_t history_index);
 
 /**
+ * Get the action button for the motion event. Returns a valid action button when the
+ * event is associated with a button press or button release action. For other actions
+ * the return value is undefined.
+ *
+ * @see #AMOTION_EVENT_BUTTON_PRIMARY
+ * @see #AMOTION_EVENT_BUTTON_SECONDARY
+ * @see #AMOTION_EVENT_BUTTON_TERTIARY
+ * @see #AMOTION_EVENT_BUTTON_BACK
+ * @see #AMOTION_EVENT_BUTTON_FORWARD
+ * @see #AMOTION_EVENT_BUTTON_STYLUS_PRIMARY
+ * @see #AMOTION_EVENT_BUTTON_STYLUS_SECONDARY
+ */
+int32_t AMotionEvent_getActionButton(const AInputEvent* motion_event)
+        __INTRODUCED_IN(__ANDROID_API_T__);
+
+/**
+ * Returns the classification for the current gesture.
+ * The classification may change as more events become available for the same gesture.
+ *
+ * @see #AMOTION_EVENT_CLASSIFICATION_NONE
+ * @see #AMOTION_EVENT_CLASSIFICATION_AMBIGUOUS_GESTURE
+ * @see #AMOTION_EVENT_CLASSIFICATION_DEEP_PRESS
+*/
+int32_t AMotionEvent_getClassification(const AInputEvent* motion_event)
+        __INTRODUCED_IN(__ANDROID_API_T__);
+
+/**
  * Creates a native AInputEvent* object that is a copy of the specified Java
  * android.view.MotionEvent. The result may be used with generic and MotionEvent-specific
  * AInputEvent_* functions. The object returned by this function must be disposed using
  * {@link AInputEvent_release()}.
+ *
+ * Available since API level 31.
  */
-const AInputEvent* AMotionEvent_fromJava(JNIEnv* env, jobject motionEvent);
+const AInputEvent* AMotionEvent_fromJava(JNIEnv* env, jobject motionEvent) __INTRODUCED_IN(31);
 
 struct AInputQueue;
 /**
@@ -1373,6 +1498,17 @@ int32_t AInputQueue_preDispatchEvent(AInputQueue* queue, AInputEvent* event);
  * This must be called after receiving an event with AInputQueue_get_event().
  */
 void AInputQueue_finishEvent(AInputQueue* queue, AInputEvent* event, int handled);
+
+/**
+ * Returns the AInputQueue* object associated with the supplied Java InputQueue
+ * object. The returned native object holds a weak reference to the Java object,
+ * and is only valid as long as the Java object has not yet been disposed. You
+ * should ensure that there is a strong reference to the Java object and that it
+ * has not been disposed before using the returned object.
+ *
+ * Available since API level 33.
+ */
+AInputQueue* AInputQueue_fromJava(JNIEnv* env, jobject inputQueue) __INTRODUCED_IN(33);
 
 #ifdef __cplusplus
 }

@@ -158,51 +158,98 @@ enum AHardwareBuffer_Format {
      * cube-maps or multi-layered textures.
      */
     AHARDWAREBUFFER_FORMAT_Y8Cb8Cr8_420             = 0x23,
+
+    /**
+     * YUV P010 format.
+     * Must have an even width and height. Can be accessed in OpenGL
+     * shaders through an external sampler. Does not support mip-maps
+     * cube-maps or multi-layered textures.
+     */
+    AHARDWAREBUFFER_FORMAT_YCbCr_P010               = 0x36,
+
+    /**
+     * Corresponding formats:
+     *   Vulkan: VK_FORMAT_R8_UNORM
+     *   OpenGL ES: GR_GL_R8
+     */
+    AHARDWAREBUFFER_FORMAT_R8_UNORM                 = 0x38,
+
+    /**
+     * Corresponding formats:
+     *   Vulkan: VK_FORMAT_R16_UINT
+     *   OpenGL ES: GR_GL_R16UI
+     */
+    AHARDWAREBUFFER_FORMAT_R16_UINT                 = 0x39,
+
+    /**
+     * Corresponding formats:
+     *   Vulkan: VK_FORMAT_R16G16_UINT
+     *   OpenGL ES: GR_GL_RG16UI
+     */
+    AHARDWAREBUFFER_FORMAT_R16G16_UINT              = 0x3a,
+
+    /**
+     * Corresponding formats:
+     *   Vulkan: VK_FORMAT_R10X6G10X6B10X6A10X6_UNORM_4PACK16
+     *   OpenGL ES: N/A
+     */
+    AHARDWAREBUFFER_FORMAT_R10G10B10A10_UNORM       = 0x3b,
 };
 
 /**
  * Buffer usage flags, specifying how the buffer will be accessed.
  */
 enum AHardwareBuffer_UsageFlags {
-    /// The buffer will never be locked for direct CPU reads using the
-    /// AHardwareBuffer_lock() function. Note that reading the buffer
-    /// using OpenGL or Vulkan functions or memory mappings is still
-    /// allowed.
+    /**
+     * The buffer will never be locked for direct CPU reads using the
+     * AHardwareBuffer_lock() function. Note that reading the buffer
+     * using OpenGL or Vulkan functions or memory mappings is still
+     * allowed.
+     */
     AHARDWAREBUFFER_USAGE_CPU_READ_NEVER        = 0UL,
-    /// The buffer will sometimes be locked for direct CPU reads using
-    /// the AHardwareBuffer_lock() function. Note that reading the
-    /// buffer using OpenGL or Vulkan functions or memory mappings
-    /// does not require the presence of this flag.
+    /**
+     * The buffer will sometimes be locked for direct CPU reads using
+     * the AHardwareBuffer_lock() function. Note that reading the
+     * buffer using OpenGL or Vulkan functions or memory mappings
+     * does not require the presence of this flag.
+     */
     AHARDWAREBUFFER_USAGE_CPU_READ_RARELY       = 2UL,
-    /// The buffer will often be locked for direct CPU reads using
-    /// the AHardwareBuffer_lock() function. Note that reading the
-    /// buffer using OpenGL or Vulkan functions or memory mappings
-    /// does not require the presence of this flag.
+    /**
+     * The buffer will often be locked for direct CPU reads using
+     * the AHardwareBuffer_lock() function. Note that reading the
+     * buffer using OpenGL or Vulkan functions or memory mappings
+     * does not require the presence of this flag.
+     */
     AHARDWAREBUFFER_USAGE_CPU_READ_OFTEN        = 3UL,
-    /// CPU read value mask.
+
+    /** CPU read value mask. */
     AHARDWAREBUFFER_USAGE_CPU_READ_MASK         = 0xFUL,
-
-    /// The buffer will never be locked for direct CPU writes using the
-    /// AHardwareBuffer_lock() function. Note that writing the buffer
-    /// using OpenGL or Vulkan functions or memory mappings is still
-    /// allowed.
+    /**
+     * The buffer will never be locked for direct CPU writes using the
+     * AHardwareBuffer_lock() function. Note that writing the buffer
+     * using OpenGL or Vulkan functions or memory mappings is still
+     * allowed.
+     */
     AHARDWAREBUFFER_USAGE_CPU_WRITE_NEVER       = 0UL << 4,
-    /// The buffer will sometimes be locked for direct CPU writes using
-    /// the AHardwareBuffer_lock() function. Note that writing the
-    /// buffer using OpenGL or Vulkan functions or memory mappings
-    /// does not require the presence of this flag.
+    /**
+     * The buffer will sometimes be locked for direct CPU writes using
+     * the AHardwareBuffer_lock() function. Note that writing the
+     * buffer using OpenGL or Vulkan functions or memory mappings
+     * does not require the presence of this flag.
+     */
     AHARDWAREBUFFER_USAGE_CPU_WRITE_RARELY      = 2UL << 4,
-    /// The buffer will often be locked for direct CPU writes using
-    /// the AHardwareBuffer_lock() function. Note that writing the
-    /// buffer using OpenGL or Vulkan functions or memory mappings
-    /// does not require the presence of this flag.
+    /**
+     * The buffer will often be locked for direct CPU writes using
+     * the AHardwareBuffer_lock() function. Note that writing the
+     * buffer using OpenGL or Vulkan functions or memory mappings
+     * does not require the presence of this flag.
+     */
     AHARDWAREBUFFER_USAGE_CPU_WRITE_OFTEN       = 3UL << 4,
-    /// CPU write value mask.
+    /** CPU write value mask. */
     AHARDWAREBUFFER_USAGE_CPU_WRITE_MASK        = 0xFUL << 4,
-
-    /// The buffer will be read from by the GPU as a texture.
+    /** The buffer will be read from by the GPU as a texture. */
     AHARDWAREBUFFER_USAGE_GPU_SAMPLED_IMAGE     = 1UL << 8,
-    /// The buffer will be written to by the GPU as a framebuffer attachment.
+    /** The buffer will be written to by the GPU as a framebuffer attachment.*/
     AHARDWAREBUFFER_USAGE_GPU_FRAMEBUFFER       = 1UL << 9,
     /**
      * The buffer will be written to by the GPU as a framebuffer
@@ -237,7 +284,7 @@ enum AHardwareBuffer_UsageFlags {
      * buffers are expected to behave.
      */
     AHARDWAREBUFFER_USAGE_PROTECTED_CONTENT     = 1UL << 14,
-    /// The buffer will be read by a hardware video encoder.
+    /** The buffer will be read by a hardware video encoder. */
     AHARDWAREBUFFER_USAGE_VIDEO_ENCODE          = 1UL << 16,
     /**
      * The buffer will be used for direct writes from sensors.
@@ -544,6 +591,7 @@ int AHardwareBuffer_lockAndGetInfo(AHardwareBuffer* _Nonnull buffer, uint64_t us
                                    void* _Nullable* _Nonnull outVirtualAddress,
                                    int32_t* _Nonnull outBytesPerPixel,
                                    int32_t* _Nonnull outBytesPerStride) __INTRODUCED_IN(29);
+
 
 /**
  * Get the system wide unique id for an AHardwareBuffer.

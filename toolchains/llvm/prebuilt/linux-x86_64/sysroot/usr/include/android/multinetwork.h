@@ -83,11 +83,46 @@ int android_setsocknetwork(net_handle_t network, int fd) __INTRODUCED_IN(23);
  *
  * To clear a previous process binding, invoke with NETWORK_UNSPECIFIED.
  *
- * This is the equivalent of: [android.net.ConnectivityManager#setProcessDefaultNetwork()](https://developer.android.com/reference/android/net/ConnectivityManager.html#setProcessDefaultNetwork(android.net.Network))
+ * This is the equivalent of: [android.net.ConnectivityManager#bindProcessToNetwork()](https://developer.android.com/reference/android/net/ConnectivityManager.html#bindProcessToNetwork(android.net.Network))
  *
  * Available since API level 23.
  */
 int android_setprocnetwork(net_handle_t network) __INTRODUCED_IN(23);
+
+
+/**
+ * Gets the |network| bound to the current process, as per android_setprocnetwork.
+ *
+ * This is the equivalent of: [android.net.ConnectivityManager#getBoundNetworkForProcess()](https://developer.android.com/reference/android/net/ConnectivityManager.html#getBoundNetworkForProcess(android.net.Network))
+ * Returns 0 on success, or -1 setting errno to EINVAL if a null pointer is
+ * passed in.
+ *
+ *
+ * Available since API level 31.
+ */
+int android_getprocnetwork(net_handle_t *network) __INTRODUCED_IN(31);
+
+/**
+ * Binds domain name resolutions performed by this process to |network|.
+ * android_setprocnetwork takes precedence over this setting.
+ *
+ * To clear a previous process binding, invoke with NETWORK_UNSPECIFIED.
+ * On success 0 is returned. On error -1 is returned, and errno is set.
+ *
+ * Available since API level 31.
+ */
+int android_setprocdns(net_handle_t network) __INTRODUCED_IN(31);
+
+/**
+ * Gets the |network| to which domain name resolutions are bound on the
+ * current process.
+ *
+ * Returns 0 on success, or -1 setting errno to EINVAL if a null pointer is
+ * passed in.
+ *
+ * Available since API level 31.
+ */
+int android_getprocdns(net_handle_t *network) __INTRODUCED_IN(31);
 
 
 /**
@@ -180,6 +215,79 @@ int android_res_nresult(int fd,
  * Available since API level 29.
  */
 void android_res_cancel(int nsend_fd) __INTRODUCED_IN(29);
+
+/*
+ * Set the socket tag and owning UID for traffic statistics on the specified
+ * socket.
+ *
+ * Subsequent calls always replace any existing parameters. The socket tag and
+ * uid (if set) are kept when the socket is sent to another process using binder
+ * IPCs or other mechanisms such as UNIX socket fd passing. Any app can accept
+ * blame for future traffic performed on a socket originally created by another
+ * app by calling this method with its own UID (or calling
+ * android_tag_socket(int sockfd, int tag)). However, only apps holding the
+ * android.Manifest.permission#UPDATE_DEVICE_STATS permission may assign blame
+ * to another UIDs. If unset (default) the socket tag is 0, and the uid is the
+ * socket creator's uid.
+ *
+ * Returns 0 on success, or a negative POSIX error code (see errno.h) on
+ * failure.
+ *
+ * Available since API level 33.
+ */
+int android_tag_socket_with_uid(int sockfd, uint32_t tag, uid_t uid) __INTRODUCED_IN(33);
+
+/*
+ * Set the socket tag for traffic statistics on the specified socket.
+ *
+ * This function tags the socket with the caller's UID (accepting blame for
+ * future traffic performed on this socket) even if the socket was originally
+ * opened by another UID or was previously tagged by another UID. Subsequent
+ * calls always replace any existing parameters. The socket tag is kept when the
+ * socket is sent to another process using binder IPCs or other mechanisms such
+ * as UNIX socket fd passing. The tag is a value defined by the caller and used
+ * together with uid for data traffic accounting, so that the function callers
+ * can account different types of data usage for a uid.
+ *
+ * Returns 0 on success, or a negative POSIX error code (see errno.h) on
+ * failure.
+ *
+ * Some possible error codes:
+ * -EBADF           Bad socketfd.
+ * -EPERM           No permission.
+ * -EAFNOSUPPORT    Socket family is neither AF_INET nor AF_INET6.
+ * -EPROTONOSUPPORT Socket protocol is neither IPPROTO_UDP nor IPPROTO_TCP.
+ * -EMFILE          Too many stats entries.
+ * There are still other error codes that may provided by -errno of
+ * [getsockopt()](https://man7.org/linux/man-pages/man2/getsockopt.2.html) or by
+ * BPF maps read/write sys calls, which are set appropriately.
+ *
+ * Available since API level 33.
+ */
+int android_tag_socket(int sockfd, uint32_t tag) __INTRODUCED_IN(33);
+
+/*
+ * Untag a network socket.
+ *
+ * Future traffic on this socket will no longer be associated with any
+ * previously configured tag and uid. If the socket was created by another UID
+ * or was previously tagged by another UID, calling this function will clear the
+ * statistics parameters, and thus the UID blamed for traffic on the socket will
+ * be the UID that originally created the socket, even if the socket was
+ * subsequently tagged by a different UID.
+ *
+ * Returns 0 on success, or a negative POSIX error code (see errno.h) on
+ * failure.
+ *
+ * One of possible error code:
+ * -EBADF           Bad socketfd.
+ * Other error codes are either provided by -errno of
+ * [getsockopt()](https://man7.org/linux/man-pages/man2/getsockopt.2.html) or by
+ * BPF map element deletion sys call, which are set appropriately.
+ *
+ * Available since API level 33.
+ */
+int android_untag_socket(int sockfd) __INTRODUCED_IN(33);
 
 __END_DECLS
 

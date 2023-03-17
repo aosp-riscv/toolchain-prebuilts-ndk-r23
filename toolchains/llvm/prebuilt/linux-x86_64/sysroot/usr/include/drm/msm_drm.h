@@ -39,13 +39,22 @@ struct drm_msm_timespec {
 #define MSM_PARAM_MAX_FREQ 0x04
 #define MSM_PARAM_TIMESTAMP 0x05
 #define MSM_PARAM_GMEM_BASE 0x06
-#define MSM_PARAM_NR_RINGS 0x07
+#define MSM_PARAM_PRIORITIES 0x07
 #define MSM_PARAM_PP_PGTABLE 0x08
 #define MSM_PARAM_FAULTS 0x09
+#define MSM_PARAM_SUSPENDS 0x0a
+#define MSM_PARAM_SYSPROF 0x0b
+#define MSM_PARAM_COMM 0x0c
+#define MSM_PARAM_CMDLINE 0x0d
+#define MSM_PARAM_VA_START 0x0e
+#define MSM_PARAM_VA_SIZE 0x0f
+#define MSM_PARAM_NR_RINGS MSM_PARAM_PRIORITIES
 struct drm_msm_param {
   __u32 pipe;
   __u32 param;
   __u64 value;
+  __u32 len;
+  __u32 pad;
 };
 #define MSM_BO_SCANOUT 0x00000001
 #define MSM_BO_GPU_READONLY 0x00000002
@@ -53,7 +62,8 @@ struct drm_msm_param {
 #define MSM_BO_CACHED 0x00010000
 #define MSM_BO_WC 0x00020000
 #define MSM_BO_UNCACHED 0x00040000
-#define MSM_BO_FLAGS (MSM_BO_SCANOUT | MSM_BO_GPU_READONLY | MSM_BO_CACHED | MSM_BO_WC | MSM_BO_UNCACHED)
+#define MSM_BO_CACHED_COHERENT 0x080000
+#define MSM_BO_FLAGS (MSM_BO_SCANOUT | MSM_BO_GPU_READONLY | MSM_BO_CACHE_MASK)
 struct drm_msm_gem_new {
   __u64 size;
   __u32 flags;
@@ -63,6 +73,7 @@ struct drm_msm_gem_new {
 #define MSM_INFO_GET_IOVA 0x01
 #define MSM_INFO_SET_NAME 0x02
 #define MSM_INFO_GET_NAME 0x03
+#define MSM_INFO_SET_IOVA 0x04
 struct drm_msm_gem_info {
   __u32 handle;
   __u32 info;
@@ -116,7 +127,8 @@ struct drm_msm_gem_submit_bo {
 #define MSM_SUBMIT_SUDO 0x10000000
 #define MSM_SUBMIT_SYNCOBJ_IN 0x08000000
 #define MSM_SUBMIT_SYNCOBJ_OUT 0x04000000
-#define MSM_SUBMIT_FLAGS (MSM_SUBMIT_NO_IMPLICIT | MSM_SUBMIT_FENCE_FD_IN | MSM_SUBMIT_FENCE_FD_OUT | MSM_SUBMIT_SUDO | MSM_SUBMIT_SYNCOBJ_IN | MSM_SUBMIT_SYNCOBJ_OUT | 0)
+#define MSM_SUBMIT_FENCE_SN_IN 0x02000000
+#define MSM_SUBMIT_FLAGS (MSM_SUBMIT_NO_IMPLICIT | MSM_SUBMIT_FENCE_FD_IN | MSM_SUBMIT_FENCE_FD_OUT | MSM_SUBMIT_SUDO | MSM_SUBMIT_SYNCOBJ_IN | MSM_SUBMIT_SYNCOBJ_OUT | MSM_SUBMIT_FENCE_SN_IN | 0)
 #define MSM_SUBMIT_SYNCOBJ_RESET 0x00000001
 #define MSM_SUBMIT_SYNCOBJ_FLAGS (MSM_SUBMIT_SYNCOBJ_RESET | 0)
 struct drm_msm_gem_submit_syncobj {
@@ -169,6 +181,7 @@ struct drm_msm_submitqueue_query {
   __u32 pad;
 };
 #define DRM_MSM_GET_PARAM 0x00
+#define DRM_MSM_SET_PARAM 0x01
 #define DRM_MSM_GEM_NEW 0x02
 #define DRM_MSM_GEM_INFO 0x03
 #define DRM_MSM_GEM_CPU_PREP 0x04
@@ -180,6 +193,7 @@ struct drm_msm_submitqueue_query {
 #define DRM_MSM_SUBMITQUEUE_CLOSE 0x0B
 #define DRM_MSM_SUBMITQUEUE_QUERY 0x0C
 #define DRM_IOCTL_MSM_GET_PARAM DRM_IOWR(DRM_COMMAND_BASE + DRM_MSM_GET_PARAM, struct drm_msm_param)
+#define DRM_IOCTL_MSM_SET_PARAM DRM_IOW(DRM_COMMAND_BASE + DRM_MSM_SET_PARAM, struct drm_msm_param)
 #define DRM_IOCTL_MSM_GEM_NEW DRM_IOWR(DRM_COMMAND_BASE + DRM_MSM_GEM_NEW, struct drm_msm_gem_new)
 #define DRM_IOCTL_MSM_GEM_INFO DRM_IOWR(DRM_COMMAND_BASE + DRM_MSM_GEM_INFO, struct drm_msm_gem_info)
 #define DRM_IOCTL_MSM_GEM_CPU_PREP DRM_IOW(DRM_COMMAND_BASE + DRM_MSM_GEM_CPU_PREP, struct drm_msm_gem_cpu_prep)

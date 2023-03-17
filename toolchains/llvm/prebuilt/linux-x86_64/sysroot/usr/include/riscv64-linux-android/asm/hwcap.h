@@ -16,8 +16,8 @@
  ***
  ****************************************************************************
  ****************************************************************************/
-#ifndef __UAPI_ASM_HWCAP_H
-#define __UAPI_ASM_HWCAP_H
+#ifndef _UAPI_ASM_RISCV_HWCAP_H
+#define _UAPI_ASM_RISCV_HWCAP_H
 #define COMPAT_HWCAP_ISA_I (1 << ('I' - 'A'))
 #define COMPAT_HWCAP_ISA_M (1 << ('M' - 'A'))
 #define COMPAT_HWCAP_ISA_A (1 << ('A' - 'A'))

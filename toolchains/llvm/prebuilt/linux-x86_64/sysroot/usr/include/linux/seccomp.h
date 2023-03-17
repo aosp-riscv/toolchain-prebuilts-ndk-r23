@@ -32,6 +32,7 @@
 #define SECCOMP_FILTER_FLAG_SPEC_ALLOW (1UL << 2)
 #define SECCOMP_FILTER_FLAG_NEW_LISTENER (1UL << 3)
 #define SECCOMP_FILTER_FLAG_TSYNC_ESRCH (1UL << 4)
+#define SECCOMP_FILTER_FLAG_WAIT_KILLABLE_RECV (1UL << 5)
 #define SECCOMP_RET_KILL_PROCESS 0x80000000U
 #define SECCOMP_RET_KILL_THREAD 0x00000000U
 #define SECCOMP_RET_KILL SECCOMP_RET_KILL_THREAD
@@ -69,6 +70,7 @@ struct seccomp_notif_resp {
   __u32 flags;
 };
 #define SECCOMP_ADDFD_FLAG_SETFD (1UL << 0)
+#define SECCOMP_ADDFD_FLAG_SEND (1UL << 1)
 struct seccomp_notif_addfd {
   __u64 id;
   __u32 flags;

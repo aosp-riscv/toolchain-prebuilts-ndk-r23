@@ -25,8 +25,20 @@ extern "C" {
 #define fourcc_code(a,b,c,d) ((__u32) (a) | ((__u32) (b) << 8) | ((__u32) (c) << 16) | ((__u32) (d) << 24))
 #define DRM_FORMAT_BIG_ENDIAN (1U << 31)
 #define DRM_FORMAT_INVALID 0
+#define DRM_FORMAT_C1 fourcc_code('C', '1', ' ', ' ')
+#define DRM_FORMAT_C2 fourcc_code('C', '2', ' ', ' ')
+#define DRM_FORMAT_C4 fourcc_code('C', '4', ' ', ' ')
 #define DRM_FORMAT_C8 fourcc_code('C', '8', ' ', ' ')
+#define DRM_FORMAT_D1 fourcc_code('D', '1', ' ', ' ')
+#define DRM_FORMAT_D2 fourcc_code('D', '2', ' ', ' ')
+#define DRM_FORMAT_D4 fourcc_code('D', '4', ' ', ' ')
+#define DRM_FORMAT_D8 fourcc_code('D', '8', ' ', ' ')
+#define DRM_FORMAT_R1 fourcc_code('R', '1', ' ', ' ')
+#define DRM_FORMAT_R2 fourcc_code('R', '2', ' ', ' ')
+#define DRM_FORMAT_R4 fourcc_code('R', '4', ' ', ' ')
 #define DRM_FORMAT_R8 fourcc_code('R', '8', ' ', ' ')
+#define DRM_FORMAT_R10 fourcc_code('R', '1', '0', ' ')
+#define DRM_FORMAT_R12 fourcc_code('R', '1', '2', ' ')
 #define DRM_FORMAT_R16 fourcc_code('R', '1', '6', ' ')
 #define DRM_FORMAT_RG88 fourcc_code('R', 'G', '8', '8')
 #define DRM_FORMAT_GR88 fourcc_code('G', 'R', '8', '8')
@@ -70,16 +82,23 @@ extern "C" {
 #define DRM_FORMAT_ABGR2101010 fourcc_code('A', 'B', '3', '0')
 #define DRM_FORMAT_RGBA1010102 fourcc_code('R', 'A', '3', '0')
 #define DRM_FORMAT_BGRA1010102 fourcc_code('B', 'A', '3', '0')
+#define DRM_FORMAT_XRGB16161616 fourcc_code('X', 'R', '4', '8')
+#define DRM_FORMAT_XBGR16161616 fourcc_code('X', 'B', '4', '8')
+#define DRM_FORMAT_ARGB16161616 fourcc_code('A', 'R', '4', '8')
+#define DRM_FORMAT_ABGR16161616 fourcc_code('A', 'B', '4', '8')
 #define DRM_FORMAT_XRGB16161616F fourcc_code('X', 'R', '4', 'H')
 #define DRM_FORMAT_XBGR16161616F fourcc_code('X', 'B', '4', 'H')
 #define DRM_FORMAT_ARGB16161616F fourcc_code('A', 'R', '4', 'H')
 #define DRM_FORMAT_ABGR16161616F fourcc_code('A', 'B', '4', 'H')
+#define DRM_FORMAT_AXBXGXRX106106106106 fourcc_code('A', 'B', '1', '0')
 #define DRM_FORMAT_YUYV fourcc_code('Y', 'U', 'Y', 'V')
 #define DRM_FORMAT_YVYU fourcc_code('Y', 'V', 'Y', 'U')
 #define DRM_FORMAT_UYVY fourcc_code('U', 'Y', 'V', 'Y')
 #define DRM_FORMAT_VYUY fourcc_code('V', 'Y', 'U', 'Y')
 #define DRM_FORMAT_AYUV fourcc_code('A', 'Y', 'U', 'V')
+#define DRM_FORMAT_AVUY8888 fourcc_code('A', 'V', 'U', 'Y')
 #define DRM_FORMAT_XYUV8888 fourcc_code('X', 'Y', 'U', 'V')
+#define DRM_FORMAT_XVUY8888 fourcc_code('X', 'V', 'U', 'Y')
 #define DRM_FORMAT_VUY888 fourcc_code('V', 'U', '2', '4')
 #define DRM_FORMAT_VUY101010 fourcc_code('V', 'U', '3', '0')
 #define DRM_FORMAT_Y210 fourcc_code('Y', '2', '1', '0')
@@ -116,6 +135,7 @@ extern "C" {
 #define DRM_FORMAT_P010 fourcc_code('P', '0', '1', '0')
 #define DRM_FORMAT_P012 fourcc_code('P', '0', '1', '2')
 #define DRM_FORMAT_P016 fourcc_code('P', '0', '1', '6')
+#define DRM_FORMAT_P030 fourcc_code('P', '0', '3', '0')
 #define DRM_FORMAT_Q410 fourcc_code('Q', '4', '1', '0')
 #define DRM_FORMAT_Q401 fourcc_code('Q', '4', '0', '1')
 #define DRM_FORMAT_YUV410 fourcc_code('Y', 'U', 'V', '9')
@@ -128,7 +148,6 @@ extern "C" {
 #define DRM_FORMAT_YVU422 fourcc_code('Y', 'V', '1', '6')
 #define DRM_FORMAT_YUV444 fourcc_code('Y', 'U', '2', '4')
 #define DRM_FORMAT_YVU444 fourcc_code('Y', 'V', '2', '4')
-#define DRM_FORMAT_MOD_NONE 0
 #define DRM_FORMAT_MOD_VENDOR_NONE 0
 #define DRM_FORMAT_MOD_VENDOR_INTEL 0x01
 #define DRM_FORMAT_MOD_VENDOR_AMD 0x02
@@ -141,10 +160,13 @@ extern "C" {
 #define DRM_FORMAT_MOD_VENDOR_ALLWINNER 0x09
 #define DRM_FORMAT_MOD_VENDOR_AMLOGIC 0x0a
 #define DRM_FORMAT_RESERVED ((1ULL << 56) - 1)
+#define fourcc_mod_get_vendor(modifier) (((modifier) >> 56) & 0xff)
+#define fourcc_mod_is_vendor(modifier,vendor) (fourcc_mod_get_vendor(modifier) == DRM_FORMAT_MOD_VENDOR_ ##vendor)
 #define fourcc_mod_code(vendor,val) ((((__u64) DRM_FORMAT_MOD_VENDOR_ ##vendor) << 56) | ((val) & 0x00ffffffffffffffULL))
 #define DRM_FORMAT_MOD_GENERIC_16_16_TILE DRM_FORMAT_MOD_SAMSUNG_16_16_TILE
 #define DRM_FORMAT_MOD_INVALID fourcc_mod_code(NONE, DRM_FORMAT_RESERVED)
 #define DRM_FORMAT_MOD_LINEAR fourcc_mod_code(NONE, 0)
+#define DRM_FORMAT_MOD_NONE 0
 #define I915_FORMAT_MOD_X_TILED fourcc_mod_code(INTEL, 1)
 #define I915_FORMAT_MOD_Y_TILED fourcc_mod_code(INTEL, 2)
 #define I915_FORMAT_MOD_Yf_TILED fourcc_mod_code(INTEL, 3)
@@ -152,9 +174,16 @@ extern "C" {
 #define I915_FORMAT_MOD_Yf_TILED_CCS fourcc_mod_code(INTEL, 5)
 #define I915_FORMAT_MOD_Y_TILED_GEN12_RC_CCS fourcc_mod_code(INTEL, 6)
 #define I915_FORMAT_MOD_Y_TILED_GEN12_MC_CCS fourcc_mod_code(INTEL, 7)
+#define I915_FORMAT_MOD_Y_TILED_GEN12_RC_CCS_CC fourcc_mod_code(INTEL, 8)
+#define I915_FORMAT_MOD_4_TILED fourcc_mod_code(INTEL, 9)
+#define I915_FORMAT_MOD_4_TILED_DG2_RC_CCS fourcc_mod_code(INTEL, 10)
+#define I915_FORMAT_MOD_4_TILED_DG2_MC_CCS fourcc_mod_code(INTEL, 11)
+#define I915_FORMAT_MOD_4_TILED_DG2_RC_CCS_CC fourcc_mod_code(INTEL, 12)
 #define DRM_FORMAT_MOD_SAMSUNG_64_32_TILE fourcc_mod_code(SAMSUNG, 1)
 #define DRM_FORMAT_MOD_SAMSUNG_16_16_TILE fourcc_mod_code(SAMSUNG, 2)
 #define DRM_FORMAT_MOD_QCOM_COMPRESSED fourcc_mod_code(QCOM, 1)
+#define DRM_FORMAT_MOD_QCOM_TILED3 fourcc_mod_code(QCOM, 3)
+#define DRM_FORMAT_MOD_QCOM_TILED2 fourcc_mod_code(QCOM, 2)
 #define DRM_FORMAT_MOD_VIVANTE_TILED fourcc_mod_code(VIVANTE, 1)
 #define DRM_FORMAT_MOD_VIVANTE_SUPER_TILED fourcc_mod_code(VIVANTE, 2)
 #define DRM_FORMAT_MOD_VIVANTE_SPLIT_TILED fourcc_mod_code(VIVANTE, 3)
@@ -201,15 +230,70 @@ extern "C" {
 #define AFBC_FORMAT_MOD_DB (1ULL << 10)
 #define AFBC_FORMAT_MOD_BCH (1ULL << 11)
 #define AFBC_FORMAT_MOD_USM (1ULL << 12)
+#define DRM_FORMAT_MOD_ARM_TYPE_AFRC 0x02
+#define DRM_FORMAT_MOD_ARM_AFRC(__afrc_mode) DRM_FORMAT_MOD_ARM_CODE(DRM_FORMAT_MOD_ARM_TYPE_AFRC, __afrc_mode)
+#define AFRC_FORMAT_MOD_CU_SIZE_MASK 0xf
+#define AFRC_FORMAT_MOD_CU_SIZE_16 (1ULL)
+#define AFRC_FORMAT_MOD_CU_SIZE_24 (2ULL)
+#define AFRC_FORMAT_MOD_CU_SIZE_32 (3ULL)
+#define AFRC_FORMAT_MOD_CU_SIZE_P0(__afrc_cu_size) (__afrc_cu_size)
+#define AFRC_FORMAT_MOD_CU_SIZE_P12(__afrc_cu_size) ((__afrc_cu_size) << 4)
+#define AFRC_FORMAT_MOD_LAYOUT_SCAN (1ULL << 8)
 #define DRM_FORMAT_MOD_ARM_16X16_BLOCK_U_INTERLEAVED DRM_FORMAT_MOD_ARM_CODE(DRM_FORMAT_MOD_ARM_TYPE_MISC, 1ULL)
 #define DRM_FORMAT_MOD_ALLWINNER_TILED fourcc_mod_code(ALLWINNER, 1)
-#define __fourcc_mod_amlogic_layout_mask 0xf
+#define __fourcc_mod_amlogic_layout_mask 0xff
 #define __fourcc_mod_amlogic_options_shift 8
-#define __fourcc_mod_amlogic_options_mask 0xf
+#define __fourcc_mod_amlogic_options_mask 0xff
 #define DRM_FORMAT_MOD_AMLOGIC_FBC(__layout,__options) fourcc_mod_code(AMLOGIC, ((__layout) & __fourcc_mod_amlogic_layout_mask) | (((__options) & __fourcc_mod_amlogic_options_mask) << __fourcc_mod_amlogic_options_shift))
 #define AMLOGIC_FBC_LAYOUT_BASIC (1ULL)
 #define AMLOGIC_FBC_LAYOUT_SCATTER (2ULL)
 #define AMLOGIC_FBC_OPTION_MEM_SAVING (1ULL << 0)
+#define AMD_FMT_MOD fourcc_mod_code(AMD, 0)
+#define IS_AMD_FMT_MOD(val) (((val) >> 56) == DRM_FORMAT_MOD_VENDOR_AMD)
+#define AMD_FMT_MOD_TILE_VER_GFX9 1
+#define AMD_FMT_MOD_TILE_VER_GFX10 2
+#define AMD_FMT_MOD_TILE_VER_GFX10_RBPLUS 3
+#define AMD_FMT_MOD_TILE_VER_GFX11 4
+#define AMD_FMT_MOD_TILE_GFX9_64K_S 9
+#define AMD_FMT_MOD_TILE_GFX9_64K_D 10
+#define AMD_FMT_MOD_TILE_GFX9_64K_S_X 25
+#define AMD_FMT_MOD_TILE_GFX9_64K_D_X 26
+#define AMD_FMT_MOD_TILE_GFX9_64K_R_X 27
+#define AMD_FMT_MOD_TILE_GFX11_256K_R_X 31
+#define AMD_FMT_MOD_DCC_BLOCK_64B 0
+#define AMD_FMT_MOD_DCC_BLOCK_128B 1
+#define AMD_FMT_MOD_DCC_BLOCK_256B 2
+#define AMD_FMT_MOD_TILE_VERSION_SHIFT 0
+#define AMD_FMT_MOD_TILE_VERSION_MASK 0xFF
+#define AMD_FMT_MOD_TILE_SHIFT 8
+#define AMD_FMT_MOD_TILE_MASK 0x1F
+#define AMD_FMT_MOD_DCC_SHIFT 13
+#define AMD_FMT_MOD_DCC_MASK 0x1
+#define AMD_FMT_MOD_DCC_RETILE_SHIFT 14
+#define AMD_FMT_MOD_DCC_RETILE_MASK 0x1
+#define AMD_FMT_MOD_DCC_PIPE_ALIGN_SHIFT 15
+#define AMD_FMT_MOD_DCC_PIPE_ALIGN_MASK 0x1
+#define AMD_FMT_MOD_DCC_INDEPENDENT_64B_SHIFT 16
+#define AMD_FMT_MOD_DCC_INDEPENDENT_64B_MASK 0x1
+#define AMD_FMT_MOD_DCC_INDEPENDENT_128B_SHIFT 17
+#define AMD_FMT_MOD_DCC_INDEPENDENT_128B_MASK 0x1
+#define AMD_FMT_MOD_DCC_MAX_COMPRESSED_BLOCK_SHIFT 18
+#define AMD_FMT_MOD_DCC_MAX_COMPRESSED_BLOCK_MASK 0x3
+#define AMD_FMT_MOD_DCC_CONSTANT_ENCODE_SHIFT 20
+#define AMD_FMT_MOD_DCC_CONSTANT_ENCODE_MASK 0x1
+#define AMD_FMT_MOD_PIPE_XOR_BITS_SHIFT 21
+#define AMD_FMT_MOD_PIPE_XOR_BITS_MASK 0x7
+#define AMD_FMT_MOD_BANK_XOR_BITS_SHIFT 24
+#define AMD_FMT_MOD_BANK_XOR_BITS_MASK 0x7
+#define AMD_FMT_MOD_PACKERS_SHIFT 27
+#define AMD_FMT_MOD_PACKERS_MASK 0x7
+#define AMD_FMT_MOD_RB_SHIFT 30
+#define AMD_FMT_MOD_RB_MASK 0x7
+#define AMD_FMT_MOD_PIPE_SHIFT 33
+#define AMD_FMT_MOD_PIPE_MASK 0x7
+#define AMD_FMT_MOD_SET(field,value) ((__u64) (value) << AMD_FMT_MOD_ ##field ##_SHIFT)
+#define AMD_FMT_MOD_GET(field,value) (((value) >> AMD_FMT_MOD_ ##field ##_SHIFT) & AMD_FMT_MOD_ ##field ##_MASK)
+#define AMD_FMT_MOD_CLEAR(field) (~((__u64) AMD_FMT_MOD_ ##field ##_MASK << AMD_FMT_MOD_ ##field ##_SHIFT))
 #ifdef __cplusplus
 }
 #endif

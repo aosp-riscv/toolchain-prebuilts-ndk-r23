@@ -22,6 +22,7 @@
 #include <bits/ip_mreq_source.h>
 #include <bits/in_addr.h>
 #include <linux/types.h>
+#include <linux/stddef.h>
 #include <linux/libc-compat.h>
 #include <linux/socket.h>
 #if __UAPI_DEF_IN_IPPROTO
@@ -68,6 +69,8 @@ enum {
 #define IPPROTO_PIM IPPROTO_PIM
   IPPROTO_COMP = 108,
 #define IPPROTO_COMP IPPROTO_COMP
+  IPPROTO_L2TP = 115,
+#define IPPROTO_L2TP IPPROTO_L2TP
   IPPROTO_SCTP = 132,
 #define IPPROTO_SCTP IPPROTO_SCTP
   IPPROTO_UDPLITE = 136,
@@ -155,21 +158,32 @@ struct ip_mreqn {
 #define IP_MSFILTER_SIZE(numsrc) (sizeof(struct ip_msfilter) - sizeof(__u32) + (numsrc) * sizeof(__u32))
 struct group_req {
   __u32 gr_interface;
-  struct sockaddr_storage gr_group;
+  struct __kernel_sockaddr_storage gr_group;
 };
 struct group_source_req {
   __u32 gsr_interface;
-  struct sockaddr_storage gsr_group;
-  struct sockaddr_storage gsr_source;
+  struct __kernel_sockaddr_storage gsr_group;
+  struct __kernel_sockaddr_storage gsr_source;
 };
 struct group_filter {
-  __u32 gf_interface;
-  struct sockaddr_storage gf_group;
-  __u32 gf_fmode;
-  __u32 gf_numsrc;
-  struct sockaddr_storage gf_slist[1];
+  union {
+    struct {
+      __u32 gf_interface_aux;
+      struct __kernel_sockaddr_storage gf_group_aux;
+      __u32 gf_fmode_aux;
+      __u32 gf_numsrc_aux;
+      struct __kernel_sockaddr_storage gf_slist[1];
+    };
+    struct {
+      __u32 gf_interface;
+      struct __kernel_sockaddr_storage gf_group;
+      __u32 gf_fmode;
+      __u32 gf_numsrc;
+      struct __kernel_sockaddr_storage gf_slist_flex[];
+    };
+  };
 };
-#define GROUP_FILTER_SIZE(numsrc) (sizeof(struct group_filter) - sizeof(struct sockaddr_storage) + (numsrc) * sizeof(struct sockaddr_storage))
+#define GROUP_FILTER_SIZE(numsrc) (sizeof(struct group_filter) - sizeof(struct __kernel_sockaddr_storage) + (numsrc) * sizeof(struct __kernel_sockaddr_storage))
 #endif
 #if __UAPI_DEF_IN_PKTINFO
 struct in_pktinfo {
@@ -214,6 +228,7 @@ struct sockaddr_in {
 #define INADDR_ANY ((unsigned long int) 0x00000000)
 #define INADDR_BROADCAST ((unsigned long int) 0xffffffff)
 #define INADDR_NONE ((unsigned long int) 0xffffffff)
+#define INADDR_DUMMY ((unsigned long int) 0xc0000008)
 #define IN_LOOPBACKNET 127
 #define INADDR_LOOPBACK 0x7f000001
 #define IN_LOOPBACK(a) ((((long int) (a)) & 0xff000000) == 0x7f000000)

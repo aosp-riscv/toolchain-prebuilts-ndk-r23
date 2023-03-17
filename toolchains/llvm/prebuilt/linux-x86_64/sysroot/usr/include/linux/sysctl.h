@@ -18,7 +18,7 @@
  ****************************************************************************/
 #ifndef _UAPI_LINUX_SYSCTL_H
 #define _UAPI_LINUX_SYSCTL_H
-#include <linux/kernel.h>
+#include <linux/const.h>
 #include <linux/types.h>
 #include <linux/compiler.h>
 #define CTL_MAXNAME 10
@@ -407,6 +407,7 @@ enum {
   NET_IPV4_CONF_PROMOTE_SECONDARIES = 20,
   NET_IPV4_CONF_ARP_ACCEPT = 21,
   NET_IPV4_CONF_ARP_NOTIFY = 22,
+  NET_IPV4_CONF_ARP_EVICT_NOCARRIER = 23,
 };
 enum {
   NET_IPV4_NF_CONNTRACK_MAX = 1,
@@ -489,6 +490,7 @@ enum {
   NET_IPV6_ACCEPT_SOURCE_ROUTE = 25,
   NET_IPV6_ACCEPT_RA_FROM_LOCAL = 26,
   NET_IPV6_ACCEPT_RA_RT_INFO_MIN_PLEN = 27,
+  NET_IPV6_RA_DEFRTR_METRIC = 28,
   __NET_IPV6_MAX
 };
 enum {
@@ -514,6 +516,7 @@ enum {
   NET_NEIGH_GC_THRESH3 = 16,
   NET_NEIGH_RETRANS_TIME_MS = 17,
   NET_NEIGH_REACHABLE_TIME_MS = 18,
+  NET_NEIGH_INTERVAL_PROBE_TIME_MS = 19,
 };
 enum {
   NET_DCCP_DEFAULT = 1,

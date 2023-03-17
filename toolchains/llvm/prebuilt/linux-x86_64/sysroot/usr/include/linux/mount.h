@@ -18,6 +18,7 @@
  ****************************************************************************/
 #ifndef _UAPI_LINUX_MOUNT_H
 #define _UAPI_LINUX_MOUNT_H
+#include <linux/types.h>
 #define MS_RDONLY 1
 #define MS_NOSUID 2
 #define MS_NODEV 4
@@ -61,7 +62,8 @@
 #define MOVE_MOUNT_T_SYMLINKS 0x00000010
 #define MOVE_MOUNT_T_AUTOMOUNTS 0x00000020
 #define MOVE_MOUNT_T_EMPTY_PATH 0x00000040
-#define MOVE_MOUNT__MASK 0x00000077
+#define MOVE_MOUNT_SET_GROUP 0x00000100
+#define MOVE_MOUNT__MASK 0x00000177
 #define FSOPEN_CLOEXEC 0x00000001
 #define FSPICK_CLOEXEC 0x00000001
 #define FSPICK_SYMLINK_NOFOLLOW 0x00000002
@@ -87,4 +89,13 @@ enum fsconfig_command {
 #define MOUNT_ATTR_NOATIME 0x00000010
 #define MOUNT_ATTR_STRICTATIME 0x00000020
 #define MOUNT_ATTR_NODIRATIME 0x00000080
+#define MOUNT_ATTR_IDMAP 0x00100000
+#define MOUNT_ATTR_NOSYMFOLLOW 0x00200000
+struct mount_attr {
+  __u64 attr_set;
+  __u64 attr_clr;
+  __u64 propagation;
+  __u64 userns_fd;
+};
+#define MOUNT_ATTR_SIZE_VER0 32
 #endif

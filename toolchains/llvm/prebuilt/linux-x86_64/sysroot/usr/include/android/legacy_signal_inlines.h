@@ -50,7 +50,7 @@ static __inline int __ndk_legacy___libc_current_sigrtmax() {
    * can't use __builtin_available, but the platform builds with -Werror=unguarded-availability so
    * it requires __builtin_available.
    */
-#if defined(__ANDROID_UNGUARDED_AVAILABILITY__)
+#if defined(__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__)
   if (__builtin_available(android 21, *)) {
 #else
   if (__libc_current_sigrtmax) {
@@ -66,7 +66,7 @@ static __inline int __ndk_legacy___libc_current_sigrtmin() {
    * can't use __builtin_available, but the platform builds with -Werror=unguarded-availability so
    * it requires __builtin_available.
    */
-#if defined(__ANDROID_UNGUARDED_AVAILABILITY__)
+#if defined(__ANDROID_UNAVAILABLE_SYMBOLS_ARE_WEAK__)
   if (__builtin_available(android 21, *)) {
 #else
   if (__libc_current_sigrtmin) {
@@ -89,7 +89,7 @@ static __inline int sigismember(const sigset_t *set, int signum) {
     errno = EINVAL;
     return -1;
   }
-  return (int)((local_set[bit / LONG_BIT] >> (bit % LONG_BIT)) & 1);
+  return (int)((local_set[bit / (8 * sizeof(long))] >> (bit % (8 * sizeof(long)))) & 1);
 }
 
 static __inline int sigaddset(sigset_t *set, int signum) {
@@ -100,7 +100,7 @@ static __inline int sigaddset(sigset_t *set, int signum) {
     errno = EINVAL;
     return -1;
   }
-  local_set[bit / LONG_BIT] |= 1UL << (bit % LONG_BIT);
+  local_set[bit / (8 * sizeof(long))] |= 1UL << (bit % (8 * sizeof(long)));
   return 0;
 }
 
@@ -112,7 +112,7 @@ static __inline int sigdelset(sigset_t *set, int signum) {
     errno = EINVAL;
     return -1;
   }
-  local_set[bit / LONG_BIT] &= ~(1UL << (bit % LONG_BIT));
+  local_set[bit / (8 * sizeof(long))] &= ~(1UL << (bit % (8 * sizeof(long))));
   return 0;
 }
 

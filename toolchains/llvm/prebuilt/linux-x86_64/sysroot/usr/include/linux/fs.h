@@ -63,7 +63,7 @@ struct file_dedupe_range {
   __u16 dest_count;
   __u16 reserved1;
   __u32 reserved2;
-  struct file_dedupe_range_info info[0];
+  struct file_dedupe_range_info info[];
 };
 struct files_stat_struct {
   unsigned long nr_files;
@@ -129,6 +129,7 @@ struct fsxattr {
 #define BLKSECDISCARD _IO(0x12, 125)
 #define BLKROTATIONAL _IO(0x12, 126)
 #define BLKZEROOUT _IO(0x12, 127)
+#define BLKGETDISKSEQ _IOR(0x12, 128, __u64)
 #define BMAP_IOCTL 1
 #define FIBMAP _IO(0x00, 1)
 #define FIGETBSZ _IO(0x00, 2)

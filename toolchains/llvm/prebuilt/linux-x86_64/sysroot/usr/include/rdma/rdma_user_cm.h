@@ -88,7 +88,7 @@ struct rdma_ucm_bind {
   __u32 id;
   __u16 addr_size;
   __u16 reserved;
-  struct sockaddr_storage addr;
+  struct __kernel_sockaddr_storage addr;
 };
 struct rdma_ucm_resolve_ip {
   struct sockaddr_in6 src_addr;
@@ -102,8 +102,8 @@ struct rdma_ucm_resolve_addr {
   __u16 src_size;
   __u16 dst_size;
   __u32 reserved;
-  struct sockaddr_storage src_addr;
-  struct sockaddr_storage dst_addr;
+  struct __kernel_sockaddr_storage src_addr;
+  struct __kernel_sockaddr_storage dst_addr;
 };
 struct rdma_ucm_resolve_route {
   __u32 id;
@@ -137,15 +137,15 @@ struct rdma_ucm_query_addr_resp {
   __u16 pkey;
   __u16 src_size;
   __u16 dst_size;
-  struct sockaddr_storage src_addr;
-  struct sockaddr_storage dst_addr;
+  struct __kernel_sockaddr_storage src_addr;
+  struct __kernel_sockaddr_storage dst_addr;
   __u32 ibdev_index;
   __u32 reserved1;
 };
 struct rdma_ucm_query_path_resp {
   __u32 num_paths;
   __u32 reserved;
-  struct ib_path_rec_data path_data[0];
+  struct ib_path_rec_data path_data[];
 };
 struct rdma_ucm_conn_param {
   __u32 qp_num;
@@ -225,7 +225,7 @@ struct rdma_ucm_join_mcast {
   __u32 id;
   __u16 addr_size;
   __u16 join_flags;
-  struct sockaddr_storage addr;
+  struct __kernel_sockaddr_storage addr;
 };
 struct rdma_ucm_get_event {
   __aligned_u64 response;

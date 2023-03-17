@@ -18,7 +18,6 @@
  ****************************************************************************/
 #ifndef __LINUX_MEDIA_H
 #define __LINUX_MEDIA_H
-#include <stdint.h>
 #include <linux/ioctl.h>
 #include <linux/types.h>
 struct media_device_info {
@@ -61,6 +60,7 @@ struct media_device_info {
 #define MEDIA_ENT_F_PROC_VIDEO_STATISTICS (MEDIA_ENT_F_BASE + 0x4006)
 #define MEDIA_ENT_F_PROC_VIDEO_ENCODER (MEDIA_ENT_F_BASE + 0x4007)
 #define MEDIA_ENT_F_PROC_VIDEO_DECODER (MEDIA_ENT_F_BASE + 0x4008)
+#define MEDIA_ENT_F_PROC_VIDEO_ISP (MEDIA_ENT_F_BASE + 0x4009)
 #define MEDIA_ENT_F_VID_MUX (MEDIA_ENT_F_BASE + 0x5001)
 #define MEDIA_ENT_F_VID_IF_BRIDGE (MEDIA_ENT_F_BASE + 0x5002)
 #define MEDIA_ENT_F_ATV_DECODER (MEDIA_ENT_F_OLD_SUBDEV_BASE + 4)
@@ -116,6 +116,7 @@ struct media_pad_desc {
 #define MEDIA_LNK_FL_LINK_TYPE (0xf << 28)
 #define MEDIA_LNK_FL_DATA_LINK (0 << 28)
 #define MEDIA_LNK_FL_INTERFACE_LINK (1 << 28)
+#define MEDIA_LNK_FL_ANCILLARY_LINK (2 << 28)
 struct media_link_desc {
   struct media_pad_desc source;
   struct media_pad_desc sink;

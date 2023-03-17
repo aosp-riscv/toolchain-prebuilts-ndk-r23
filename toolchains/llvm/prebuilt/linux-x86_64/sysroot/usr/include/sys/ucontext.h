@@ -26,8 +26,7 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _SYS_UCONTEXT_H_
-#define _SYS_UCONTEXT_H_
+#pragma once
 
 #include <sys/cdefs.h>
 
@@ -367,7 +366,10 @@ typedef struct ucontext_t {
   unsigned long uc_flags;
   struct ucontext_t* uc_link;
   stack_t uc_stack;
-  sigset_t uc_sigmask;
+  union {
+    sigset_t uc_sigmask;
+    sigset64_t uc_sigmask64;
+  };
   /* The kernel adds extra padding here to allow sigset_t to grow. */
   char __padding[128 - sizeof(sigset_t)];
   mcontext_t uc_mcontext;
@@ -376,5 +378,3 @@ typedef struct ucontext_t {
 #endif
 
 __END_DECLS
-
-#endif /* _SYS_UCONTEXT_H_ */

@@ -22,6 +22,7 @@
 #include <linux/ioctl.h>
 #define KVM_PIO_PAGE_OFFSET 1
 #define KVM_COALESCED_MMIO_PAGE_OFFSET 2
+#define KVM_DIRTY_LOG_PAGE_OFFSET 64
 #define DE_VECTOR 0
 #define DB_VECTOR 1
 #define BP_VECTOR 3
@@ -110,6 +111,7 @@ struct kvm_ioapic_state {
 #define KVM_IRQCHIP_IOAPIC 2
 #define KVM_NR_IRQCHIPS 3
 #define KVM_RUN_X86_SMM (1 << 0)
+#define KVM_RUN_X86_BUS_LOCK (1 << 1)
 struct kvm_regs {
   __u64 rax, rbx, rcx, rdx;
   __u64 rsi, rdi, rsp, rbp;
@@ -144,6 +146,17 @@ struct kvm_sregs {
   __u64 apic_base;
   __u64 interrupt_bitmap[(KVM_NR_INTERRUPTS + 63) / 64];
 };
+struct kvm_sregs2 {
+  struct kvm_segment cs, ds, es, fs, gs, ss;
+  struct kvm_segment tr, ldt;
+  struct kvm_dtable gdt, idt;
+  __u64 cr0, cr2, cr3, cr4, cr8;
+  __u64 efer;
+  __u64 apic_base;
+  __u64 flags;
+  __u64 pdptrs[4];
+};
+#define KVM_SREGS2_FLAGS_PDPTRS_VALID 1
 struct kvm_fpu {
   __u8 fpr[8][16];
   __u16 fcw;
@@ -165,11 +178,11 @@ struct kvm_msr_entry {
 struct kvm_msrs {
   __u32 nmsrs;
   __u32 pad;
-  struct kvm_msr_entry entries[0];
+  struct kvm_msr_entry entries[];
 };
 struct kvm_msr_list {
   __u32 nmsrs;
-  __u32 indices[0];
+  __u32 indices[];
 };
 #define KVM_MSR_FILTER_MAX_BITMAP_SIZE 0x600
 struct kvm_msr_filter_range {
@@ -198,7 +211,7 @@ struct kvm_cpuid_entry {
 struct kvm_cpuid {
   __u32 nent;
   __u32 padding;
-  struct kvm_cpuid_entry entries[0];
+  struct kvm_cpuid_entry entries[];
 };
 struct kvm_cpuid_entry2 {
   __u32 function;
@@ -216,7 +229,7 @@ struct kvm_cpuid_entry2 {
 struct kvm_cpuid2 {
   __u32 nent;
   __u32 padding;
-  struct kvm_cpuid_entry2 entries[0];
+  struct kvm_cpuid_entry2 entries[];
 };
 struct kvm_pit_channel_state {
   __u32 count;
@@ -244,6 +257,7 @@ struct kvm_debug_exit_arch {
 #define KVM_GUESTDBG_USE_HW_BP 0x00020000
 #define KVM_GUESTDBG_INJECT_DB 0x00040000
 #define KVM_GUESTDBG_INJECT_BP 0x00080000
+#define KVM_GUESTDBG_BLOCKIRQ 0x00100000
 struct kvm_guest_debug_arch {
   __u64 debugreg[8];
 };
@@ -251,6 +265,7 @@ struct kvm_pit_state {
   struct kvm_pit_channel_state channels[3];
 };
 #define KVM_PIT_FLAGS_HPET_LEGACY 0x00000001
+#define KVM_PIT_FLAGS_SPEAKER_DATA_ON 0x00000002
 struct kvm_pit_state2 {
   struct kvm_pit_channel_state channels[3];
   __u32 flags;
@@ -265,6 +280,7 @@ struct kvm_reinject_control {
 #define KVM_VCPUEVENT_VALID_SHADOW 0x00000004
 #define KVM_VCPUEVENT_VALID_SMM 0x00000008
 #define KVM_VCPUEVENT_VALID_PAYLOAD 0x00000010
+#define KVM_VCPUEVENT_VALID_TRIPLE_FAULT 0x00000020
 #define KVM_X86_SHADOW_INT_MOV_SS 0x01
 #define KVM_X86_SHADOW_INT_STI 0x02
 struct kvm_vcpu_events {
@@ -295,7 +311,10 @@ struct kvm_vcpu_events {
     __u8 smm_inside_nmi;
     __u8 latched_init;
   } smi;
-  __u8 reserved[27];
+  struct {
+    __u8 pending;
+  } triple_fault;
+  __u8 reserved[26];
   __u8 exception_has_payload;
   __u64 exception_payload;
 };
@@ -308,6 +327,7 @@ struct kvm_debugregs {
 };
 struct kvm_xsave {
   __u32 region[1024];
+  __u32 extra[];
 };
 #define KVM_MAX_XCRS 16
 struct kvm_xcr {
@@ -335,6 +355,8 @@ struct kvm_sync_regs {
 #define KVM_X86_QUIRK_LAPIC_MMIO_HOLE (1 << 2)
 #define KVM_X86_QUIRK_OUT_7E_INC_RIP (1 << 3)
 #define KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT (1 << 4)
+#define KVM_X86_QUIRK_FIX_HYPERCALL_INSN (1 << 5)
+#define KVM_X86_QUIRK_MWAIT_NEVER_UD_FAULTS (1 << 6)
 #define KVM_STATE_NESTED_FORMAT_VMX 0
 #define KVM_STATE_NESTED_FORMAT_SVM 1
 #define KVM_STATE_NESTED_GUEST_MODE 0x00000001
@@ -347,6 +369,7 @@ struct kvm_sync_regs {
 #define KVM_STATE_NESTED_VMX_VMCS_SIZE 0x1000
 #define KVM_STATE_NESTED_SVM_VMCB_SIZE 0x1000
 #define KVM_STATE_VMX_PREEMPTION_TIMER_DEADLINE 0x00000001
+#define KVM_X86_XCOMP_GUEST_SUPP 0
 struct kvm_vmx_nested_state_data {
   __u8 vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
   __u8 shadow_vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
@@ -357,6 +380,7 @@ struct kvm_vmx_nested_state_hdr {
   struct {
     __u16 flags;
   } smm;
+  __u16 pad;
   __u32 flags;
   __u64 preemption_timer_deadline;
 };
@@ -386,8 +410,10 @@ struct kvm_pmu_event_filter {
   __u32 fixed_counter_bitmap;
   __u32 flags;
   __u32 pad[4];
-  __u64 events[0];
+  __u64 events[];
 };
 #define KVM_PMU_EVENT_ALLOW 0
 #define KVM_PMU_EVENT_DENY 1
+#define KVM_VCPU_TSC_CTRL 0
+#define KVM_VCPU_TSC_OFFSET 0
 #endif

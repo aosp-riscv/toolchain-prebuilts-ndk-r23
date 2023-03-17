@@ -18,6 +18,7 @@
  ****************************************************************************/
 #ifndef __LINUX_KVM_H
 #define __LINUX_KVM_H
+#include <linux/const.h>
 #include <linux/types.h>
 #include <linux/compiler.h>
 #include <linux/ioctl.h>
@@ -164,6 +165,19 @@ struct kvm_hyperv_exit {
     } syndbg;
   } u;
 };
+struct kvm_xen_exit {
+#define KVM_EXIT_XEN_HCALL 1
+  __u32 type;
+  union {
+    struct {
+      __u32 longmode;
+      __u32 cpl;
+      __u64 input;
+      __u64 result;
+      __u64 params[6];
+    } hcall;
+  } u;
+};
 #define KVM_S390_GET_SKEYS_NONE 1
 #define KVM_S390_SKEYS_MAX 1048576
 #define KVM_EXIT_UNKNOWN 0
@@ -197,10 +211,18 @@ struct kvm_hyperv_exit {
 #define KVM_EXIT_ARM_NISV 28
 #define KVM_EXIT_X86_RDMSR 29
 #define KVM_EXIT_X86_WRMSR 30
+#define KVM_EXIT_DIRTY_RING_FULL 31
+#define KVM_EXIT_AP_RESET_HOLD 32
+#define KVM_EXIT_X86_BUS_LOCK 33
+#define KVM_EXIT_XEN 34
+#define KVM_EXIT_RISCV_SBI 35
+#define KVM_EXIT_RISCV_CSR 36
+#define KVM_EXIT_NOTIFY 37
 #define KVM_INTERNAL_ERROR_EMULATION 1
 #define KVM_INTERNAL_ERROR_SIMUL_EX 2
 #define KVM_INTERNAL_ERROR_DELIVERY_EV 3
 #define KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON 4
+#define KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES (1ULL << 0)
 struct kvm_run {
   __u8 request_interrupt_window;
   __u8 immediate_exit;
@@ -283,6 +305,17 @@ struct kvm_run {
       __u64 data[16];
     } internal;
     struct {
+      __u32 suberror;
+      __u32 ndata;
+      __u64 flags;
+      union {
+        struct {
+          __u8 insn_size;
+          __u8 insn_bytes[15];
+        };
+      };
+    } emulation_failure;
+    struct {
       __u64 gprs[32];
     } osi;
     struct {
@@ -305,8 +338,15 @@ struct kvm_run {
 #define KVM_SYSTEM_EVENT_SHUTDOWN 1
 #define KVM_SYSTEM_EVENT_RESET 2
 #define KVM_SYSTEM_EVENT_CRASH 3
+#define KVM_SYSTEM_EVENT_WAKEUP 4
+#define KVM_SYSTEM_EVENT_SUSPEND 5
+#define KVM_SYSTEM_EVENT_SEV_TERM 6
       __u32 type;
-      __u64 flags;
+      __u32 ndata;
+      union {
+        __u64 flags;
+        __u64 data[16];
+      };
     } system_event;
     struct {
       __u64 addr;
@@ -334,6 +374,23 @@ struct kvm_run {
       __u32 index;
       __u64 data;
     } msr;
+    struct kvm_xen_exit xen;
+    struct {
+      unsigned long extension_id;
+      unsigned long function_id;
+      unsigned long args[6];
+      unsigned long ret[2];
+    } riscv_sbi;
+    struct {
+      unsigned long csr_num;
+      unsigned long new_value;
+      unsigned long write_mask;
+      unsigned long ret_value;
+    } riscv_csr;
+    struct {
+#define KVM_NOTIFY_CONTEXT_INVALID (1 << 0)
+      __u32 flags;
+    } notify;
     char padding[256];
   };
 #define SYNC_REGS_SIZE_BYTES 2048
@@ -363,7 +420,7 @@ struct kvm_coalesced_mmio {
 };
 struct kvm_coalesced_mmio_ring {
   __u32 first, last;
-  struct kvm_coalesced_mmio coalesced_mmio[0];
+  struct kvm_coalesced_mmio coalesced_mmio[];
 };
 #define KVM_COALESCED_MMIO_MAX ((PAGE_SIZE - sizeof(struct kvm_coalesced_mmio_ring)) / sizeof(struct kvm_coalesced_mmio))
 struct kvm_translation {
@@ -381,7 +438,10 @@ struct kvm_s390_mem_op {
   __u32 op;
   __u64 buf;
   union {
-    __u8 ar;
+    struct {
+      __u8 ar;
+      __u8 key;
+    };
     __u32 sida_offset;
     __u8 reserved[32];
   };
@@ -390,8 +450,11 @@ struct kvm_s390_mem_op {
 #define KVM_S390_MEMOP_LOGICAL_WRITE 1
 #define KVM_S390_MEMOP_SIDA_READ 2
 #define KVM_S390_MEMOP_SIDA_WRITE 3
+#define KVM_S390_MEMOP_ABSOLUTE_READ 4
+#define KVM_S390_MEMOP_ABSOLUTE_WRITE 5
 #define KVM_S390_MEMOP_F_CHECK_ONLY (1ULL << 0)
 #define KVM_S390_MEMOP_F_INJECT_EXCEPTION (1ULL << 1)
+#define KVM_S390_MEMOP_F_SKEY_PROTECTION (1ULL << 2)
 struct kvm_interrupt {
   __u32 irq;
 };
@@ -414,7 +477,7 @@ struct kvm_clear_dirty_log {
 };
 struct kvm_signal_mask {
   __u32 len;
-  __u8 sigset[0];
+  __u8 sigset[];
 };
 struct kvm_tpr_access_ctl {
   __u32 enabled;
@@ -433,6 +496,8 @@ struct kvm_vapic_addr {
 #define KVM_MP_STATE_CHECK_STOP 6
 #define KVM_MP_STATE_OPERATING 7
 #define KVM_MP_STATE_LOAD 8
+#define KVM_MP_STATE_AP_RESET_HOLD 9
+#define KVM_MP_STATE_SUSPENDED 10
 struct kvm_mp_state {
   __u32 mp_state;
 };
@@ -831,6 +896,39 @@ struct kvm_ppc_resize_hpt {
 #define KVM_CAP_X86_USER_SPACE_MSR 188
 #define KVM_CAP_X86_MSR_FILTER 189
 #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
+#define KVM_CAP_SYS_HYPERV_CPUID 191
+#define KVM_CAP_DIRTY_LOG_RING 192
+#define KVM_CAP_X86_BUS_LOCK_EXIT 193
+#define KVM_CAP_PPC_DAWR1 194
+#define KVM_CAP_SET_GUEST_DEBUG2 195
+#define KVM_CAP_SGX_ATTRIBUTE 196
+#define KVM_CAP_VM_COPY_ENC_CONTEXT_FROM 197
+#define KVM_CAP_PTP_KVM 198
+#define KVM_CAP_HYPERV_ENFORCE_CPUID 199
+#define KVM_CAP_SREGS2 200
+#define KVM_CAP_EXIT_HYPERCALL 201
+#define KVM_CAP_PPC_RPT_INVALIDATE 202
+#define KVM_CAP_BINARY_STATS_FD 203
+#define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
+#define KVM_CAP_ARM_MTE 205
+#define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
+#define KVM_CAP_VM_GPA_BITS 207
+#define KVM_CAP_XSAVE2 208
+#define KVM_CAP_SYS_ATTRIBUTES 209
+#define KVM_CAP_PPC_AIL_MODE_3 210
+#define KVM_CAP_S390_MEM_OP_EXTENSION 211
+#define KVM_CAP_PMU_CAPABILITY 212
+#define KVM_CAP_DISABLE_QUIRKS2 213
+#define KVM_CAP_VM_TSC_CONTROL 214
+#define KVM_CAP_SYSTEM_EVENT_DATA 215
+#define KVM_CAP_ARM_SYSTEM_SUSPEND 216
+#define KVM_CAP_S390_PROTECTED_DUMP 217
+#define KVM_CAP_X86_TRIPLE_FAULT_EVENT 218
+#define KVM_CAP_X86_NOTIFY_VMEXIT 219
+#define KVM_CAP_VM_DISABLE_NX_HUGE_PAGES 220
+#define KVM_CAP_S390_ZPCI_OP 221
+#define KVM_CAP_S390_CPU_TOPOLOGY 222
+#define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
 #ifdef KVM_CAP_IRQ_ROUTING
 struct kvm_irq_routing_irqchip {
   __u32 irqchip;
@@ -856,10 +954,17 @@ struct kvm_irq_routing_hv_sint {
   __u32 vcpu;
   __u32 sint;
 };
+struct kvm_irq_routing_xen_evtchn {
+  __u32 port;
+  __u32 vcpu;
+  __u32 priority;
+};
+#define KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL ((__u32) (- 1))
 #define KVM_IRQ_ROUTING_IRQCHIP 1
 #define KVM_IRQ_ROUTING_MSI 2
 #define KVM_IRQ_ROUTING_S390_ADAPTER 3
 #define KVM_IRQ_ROUTING_HV_SINT 4
+#define KVM_IRQ_ROUTING_XEN_EVTCHN 5
 struct kvm_irq_routing_entry {
   __u32 gsi;
   __u32 type;
@@ -870,13 +975,14 @@ struct kvm_irq_routing_entry {
     struct kvm_irq_routing_msi msi;
     struct kvm_irq_routing_s390_adapter adapter;
     struct kvm_irq_routing_hv_sint hv_sint;
+    struct kvm_irq_routing_xen_evtchn xen_evtchn;
     __u32 pad[8];
   } u;
 };
 struct kvm_irq_routing {
   __u32 nr;
   __u32 flags;
-  struct kvm_irq_routing_entry entries[0];
+  struct kvm_irq_routing_entry entries[];
 };
 #endif
 #ifdef KVM_CAP_MCE
@@ -891,6 +997,12 @@ struct kvm_x86_mce {
 };
 #endif
 #ifdef KVM_CAP_XEN_HVM
+#define KVM_XEN_HVM_CONFIG_HYPERCALL_MSR (1 << 0)
+#define KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL (1 << 1)
+#define KVM_XEN_HVM_CONFIG_SHARED_INFO (1 << 2)
+#define KVM_XEN_HVM_CONFIG_RUNSTATE (1 << 3)
+#define KVM_XEN_HVM_CONFIG_EVTCHN_2LEVEL (1 << 4)
+#define KVM_XEN_HVM_CONFIG_EVTCHN_SEND (1 << 5)
 struct kvm_xen_hvm_config {
   __u32 flags;
   __u32 msr;
@@ -911,10 +1023,15 @@ struct kvm_irqfd {
   __u8 pad[16];
 };
 #define KVM_CLOCK_TSC_STABLE 2
+#define KVM_CLOCK_REALTIME (1 << 2)
+#define KVM_CLOCK_HOST_TSC (1 << 3)
 struct kvm_clock_data {
   __u64 clock;
   __u32 flags;
-  __u32 pad[9];
+  __u32 pad0;
+  __u64 realtime;
+  __u64 host_tsc;
+  __u32 pad[4];
 };
 #define KVM_MMU_FSL_BOOKE_NOHV 0
 #define KVM_MMU_FSL_BOOKE_HV 1
@@ -951,7 +1068,7 @@ struct kvm_dirty_tlb {
 #define KVM_REG_SIZE_U2048 0x0080000000000000ULL
 struct kvm_reg_list {
   __u64 n;
-  __u64 reg[0];
+  __u64 reg[];
 };
 struct kvm_one_reg {
   __u64 id;
@@ -1078,6 +1195,7 @@ struct kvm_s390_ucas_mapping {
 #define KVM_PPC_GET_CPU_CHAR _IOR(KVMIO, 0xb1, struct kvm_ppc_cpu_char)
 #define KVM_SET_PMU_EVENT_FILTER _IOW(KVMIO, 0xb2, struct kvm_pmu_event_filter)
 #define KVM_PPC_SVM_OFF _IO(KVMIO, 0xb3)
+#define KVM_ARM_MTE_COPY_TAGS _IOR(KVMIO, 0xb4, struct kvm_arm_copy_mte_tags)
 #define KVM_CREATE_DEVICE _IOWR(KVMIO, 0xe0, struct kvm_create_device)
 #define KVM_SET_DEVICE_ATTR _IOW(KVMIO, 0xe1, struct kvm_device_attr)
 #define KVM_GET_DEVICE_ATTR _IOW(KVMIO, 0xe2, struct kvm_device_attr)
@@ -1164,6 +1282,48 @@ struct kvm_s390_pv_unp {
   __u64 size;
   __u64 tweak;
 };
+enum pv_cmd_dmp_id {
+  KVM_PV_DUMP_INIT,
+  KVM_PV_DUMP_CONFIG_STOR_STATE,
+  KVM_PV_DUMP_COMPLETE,
+  KVM_PV_DUMP_CPU,
+};
+struct kvm_s390_pv_dmp {
+  __u64 subcmd;
+  __u64 buff_addr;
+  __u64 buff_len;
+  __u64 gaddr;
+  __u64 reserved[4];
+};
+enum pv_cmd_info_id {
+  KVM_PV_INFO_VM,
+  KVM_PV_INFO_DUMP,
+};
+struct kvm_s390_pv_info_dump {
+  __u64 dump_cpu_buffer_len;
+  __u64 dump_config_mem_buffer_per_1m;
+  __u64 dump_config_finalize_len;
+};
+struct kvm_s390_pv_info_vm {
+  __u64 inst_calls_list[4];
+  __u64 max_cpus;
+  __u64 max_guests;
+  __u64 max_guest_addr;
+  __u64 feature_indication;
+};
+struct kvm_s390_pv_info_header {
+  __u32 id;
+  __u32 len_max;
+  __u32 len_written;
+  __u32 reserved;
+};
+struct kvm_s390_pv_info {
+  struct kvm_s390_pv_info_header header;
+  union {
+    struct kvm_s390_pv_info_dump dump;
+    struct kvm_s390_pv_info_vm vm;
+  };
+};
 enum pv_cmd_id {
   KVM_PV_ENABLE,
   KVM_PV_DISABLE,
@@ -1172,6 +1332,8 @@ enum pv_cmd_id {
   KVM_PV_VERIFY,
   KVM_PV_PREP_RESET,
   KVM_PV_UNSHARE_ALL,
+  KVM_PV_INFO,
+  KVM_PV_DUMP,
 };
 struct kvm_pv_cmd {
   __u32 cmd;
@@ -1183,6 +1345,84 @@ struct kvm_pv_cmd {
 };
 #define KVM_S390_PV_COMMAND _IOWR(KVMIO, 0xc5, struct kvm_pv_cmd)
 #define KVM_X86_SET_MSR_FILTER _IOW(KVMIO, 0xc6, struct kvm_msr_filter)
+#define KVM_RESET_DIRTY_RINGS _IO(KVMIO, 0xc7)
+#define KVM_XEN_HVM_GET_ATTR _IOWR(KVMIO, 0xc8, struct kvm_xen_hvm_attr)
+#define KVM_XEN_HVM_SET_ATTR _IOW(KVMIO, 0xc9, struct kvm_xen_hvm_attr)
+struct kvm_xen_hvm_attr {
+  __u16 type;
+  __u16 pad[3];
+  union {
+    __u8 long_mode;
+    __u8 vector;
+    struct {
+      __u64 gfn;
+    } shared_info;
+    struct {
+      __u32 send_port;
+      __u32 type;
+      __u32 flags;
+#define KVM_XEN_EVTCHN_DEASSIGN (1 << 0)
+#define KVM_XEN_EVTCHN_UPDATE (1 << 1)
+#define KVM_XEN_EVTCHN_RESET (1 << 2)
+      union {
+        struct {
+          __u32 port;
+          __u32 vcpu;
+          __u32 priority;
+        } port;
+        struct {
+          __u32 port;
+          __s32 fd;
+        } eventfd;
+        __u32 padding[4];
+      } deliver;
+    } evtchn;
+    __u32 xen_version;
+    __u64 pad[8];
+  } u;
+};
+#define KVM_XEN_ATTR_TYPE_LONG_MODE 0x0
+#define KVM_XEN_ATTR_TYPE_SHARED_INFO 0x1
+#define KVM_XEN_ATTR_TYPE_UPCALL_VECTOR 0x2
+#define KVM_XEN_ATTR_TYPE_EVTCHN 0x3
+#define KVM_XEN_ATTR_TYPE_XEN_VERSION 0x4
+#define KVM_XEN_VCPU_GET_ATTR _IOWR(KVMIO, 0xca, struct kvm_xen_vcpu_attr)
+#define KVM_XEN_VCPU_SET_ATTR _IOW(KVMIO, 0xcb, struct kvm_xen_vcpu_attr)
+#define KVM_XEN_HVM_EVTCHN_SEND _IOW(KVMIO, 0xd0, struct kvm_irq_routing_xen_evtchn)
+#define KVM_GET_SREGS2 _IOR(KVMIO, 0xcc, struct kvm_sregs2)
+#define KVM_SET_SREGS2 _IOW(KVMIO, 0xcd, struct kvm_sregs2)
+struct kvm_xen_vcpu_attr {
+  __u16 type;
+  __u16 pad[3];
+  union {
+    __u64 gpa;
+    __u64 pad[8];
+    struct {
+      __u64 state;
+      __u64 state_entry_time;
+      __u64 time_running;
+      __u64 time_runnable;
+      __u64 time_blocked;
+      __u64 time_offline;
+    } runstate;
+    __u32 vcpu_id;
+    struct {
+      __u32 port;
+      __u32 priority;
+      __u64 expires_ns;
+    } timer;
+    __u8 vector;
+  } u;
+};
+#define KVM_XEN_VCPU_ATTR_TYPE_VCPU_INFO 0x0
+#define KVM_XEN_VCPU_ATTR_TYPE_VCPU_TIME_INFO 0x1
+#define KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADDR 0x2
+#define KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_CURRENT 0x3
+#define KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_DATA 0x4
+#define KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADJUST 0x5
+#define KVM_XEN_VCPU_ATTR_TYPE_VCPU_ID 0x6
+#define KVM_XEN_VCPU_ATTR_TYPE_TIMER 0x7
+#define KVM_XEN_VCPU_ATTR_TYPE_UPCALL_VECTOR 0x8
 enum sev_cmd_id {
   KVM_SEV_INIT = 0,
   KVM_SEV_ES_INIT,
@@ -1204,6 +1444,8 @@ enum sev_cmd_id {
   KVM_SEV_DBG_DECRYPT,
   KVM_SEV_DBG_ENCRYPT,
   KVM_SEV_CERT_EXPORT,
+  KVM_SEV_GET_ATTESTATION_REPORT,
+  KVM_SEV_SEND_CANCEL,
   KVM_SEV_NR_MAX,
 };
 struct kvm_sev_cmd {
@@ -1245,6 +1487,46 @@ struct kvm_sev_dbg {
   __u64 src_uaddr;
   __u64 dst_uaddr;
   __u32 len;
+};
+struct kvm_sev_attestation_report {
+  __u8 mnonce[16];
+  __u64 uaddr;
+  __u32 len;
+};
+struct kvm_sev_send_start {
+  __u32 policy;
+  __u64 pdh_cert_uaddr;
+  __u32 pdh_cert_len;
+  __u64 plat_certs_uaddr;
+  __u32 plat_certs_len;
+  __u64 amd_certs_uaddr;
+  __u32 amd_certs_len;
+  __u64 session_uaddr;
+  __u32 session_len;
+};
+struct kvm_sev_send_update_data {
+  __u64 hdr_uaddr;
+  __u32 hdr_len;
+  __u64 guest_uaddr;
+  __u32 guest_len;
+  __u64 trans_uaddr;
+  __u32 trans_len;
+};
+struct kvm_sev_receive_start {
+  __u32 handle;
+  __u32 policy;
+  __u64 pdh_uaddr;
+  __u32 pdh_len;
+  __u64 session_uaddr;
+  __u32 session_len;
+};
+struct kvm_sev_receive_update_data {
+  __u64 hdr_uaddr;
+  __u32 hdr_len;
+  __u64 guest_uaddr;
+  __u32 guest_len;
+  __u64 trans_uaddr;
+  __u32 trans_len;
 };
 #define KVM_DEV_ASSIGN_ENABLE_IOMMU (1 << 0)
 #define KVM_DEV_ASSIGN_PCI_2_3 (1 << 1)
@@ -1303,4 +1585,81 @@ struct kvm_hyperv_eventfd {
 #define KVM_HYPERV_EVENTFD_DEASSIGN (1 << 0)
 #define KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE (1 << 0)
 #define KVM_DIRTY_LOG_INITIALLY_SET (1 << 1)
+#ifndef KVM_DIRTY_LOG_PAGE_OFFSET
+#define KVM_DIRTY_LOG_PAGE_OFFSET 0
+#endif
+#define KVM_DIRTY_GFN_F_DIRTY _BITUL(0)
+#define KVM_DIRTY_GFN_F_RESET _BITUL(1)
+#define KVM_DIRTY_GFN_F_MASK 0x3
+struct kvm_dirty_gfn {
+  __u32 flags;
+  __u32 slot;
+  __u64 offset;
+};
+#define KVM_BUS_LOCK_DETECTION_OFF (1 << 0)
+#define KVM_BUS_LOCK_DETECTION_EXIT (1 << 1)
+#define KVM_PMU_CAP_DISABLE (1 << 0)
+struct kvm_stats_header {
+  __u32 flags;
+  __u32 name_size;
+  __u32 num_desc;
+  __u32 id_offset;
+  __u32 desc_offset;
+  __u32 data_offset;
+};
+#define KVM_STATS_TYPE_SHIFT 0
+#define KVM_STATS_TYPE_MASK (0xF << KVM_STATS_TYPE_SHIFT)
+#define KVM_STATS_TYPE_CUMULATIVE (0x0 << KVM_STATS_TYPE_SHIFT)
+#define KVM_STATS_TYPE_INSTANT (0x1 << KVM_STATS_TYPE_SHIFT)
+#define KVM_STATS_TYPE_PEAK (0x2 << KVM_STATS_TYPE_SHIFT)
+#define KVM_STATS_TYPE_LINEAR_HIST (0x3 << KVM_STATS_TYPE_SHIFT)
+#define KVM_STATS_TYPE_LOG_HIST (0x4 << KVM_STATS_TYPE_SHIFT)
+#define KVM_STATS_TYPE_MAX KVM_STATS_TYPE_LOG_HIST
+#define KVM_STATS_UNIT_SHIFT 4
+#define KVM_STATS_UNIT_MASK (0xF << KVM_STATS_UNIT_SHIFT)
+#define KVM_STATS_UNIT_NONE (0x0 << KVM_STATS_UNIT_SHIFT)
+#define KVM_STATS_UNIT_BYTES (0x1 << KVM_STATS_UNIT_SHIFT)
+#define KVM_STATS_UNIT_SECONDS (0x2 << KVM_STATS_UNIT_SHIFT)
+#define KVM_STATS_UNIT_CYCLES (0x3 << KVM_STATS_UNIT_SHIFT)
+#define KVM_STATS_UNIT_BOOLEAN (0x4 << KVM_STATS_UNIT_SHIFT)
+#define KVM_STATS_UNIT_MAX KVM_STATS_UNIT_BOOLEAN
+#define KVM_STATS_BASE_SHIFT 8
+#define KVM_STATS_BASE_MASK (0xF << KVM_STATS_BASE_SHIFT)
+#define KVM_STATS_BASE_POW10 (0x0 << KVM_STATS_BASE_SHIFT)
+#define KVM_STATS_BASE_POW2 (0x1 << KVM_STATS_BASE_SHIFT)
+#define KVM_STATS_BASE_MAX KVM_STATS_BASE_POW2
+struct kvm_stats_desc {
+  __u32 flags;
+  __s16 exponent;
+  __u16 size;
+  __u32 offset;
+  __u32 bucket_size;
+  char name[];
+};
+#define KVM_GET_STATS_FD _IO(KVMIO, 0xce)
+#define KVM_GET_XSAVE2 _IOR(KVMIO, 0xcf, struct kvm_xsave)
+#define KVM_S390_PV_CPU_COMMAND _IOWR(KVMIO, 0xd0, struct kvm_pv_cmd)
+#define KVM_X86_NOTIFY_VMEXIT_ENABLED (1ULL << 0)
+#define KVM_X86_NOTIFY_VMEXIT_USER (1ULL << 1)
+#define KVM_S390_ZPCI_OP _IOW(KVMIO, 0xd1, struct kvm_s390_zpci_op)
+struct kvm_s390_zpci_op {
+  __u32 fh;
+  __u8 op;
+  __u8 pad[3];
+  union {
+    struct {
+      __u64 ibv;
+      __u64 sb;
+      __u32 flags;
+      __u32 noi;
+      __u8 isc;
+      __u8 sbo;
+      __u16 pad;
+    } reg_aen;
+    __u64 reserved[8];
+  } u;
+};
+#define KVM_S390_ZPCIOP_REG_AEN 0
+#define KVM_S390_ZPCIOP_DEREG_AEN 1
+#define KVM_S390_ZPCIOP_REGAEN_HOST (1 << 0)
 #endif
