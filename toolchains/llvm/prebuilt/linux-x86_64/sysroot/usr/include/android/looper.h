@@ -205,7 +205,7 @@ int ALooper_pollOnce(int timeoutMillis, int* outFd, int* outEvents, void** outDa
  * Removed in API 34 as ALooper_pollAll can swallow ALooper_wake calls.
  * Use ALooper_pollOnce instead.
  */
-int ALooper_pollAll(int timeoutMillis, int* outFd, int* outEvents, void** outData) __REMOVED_IN(1);
+int ALooper_pollAll(int timeoutMillis, int* outFd, int* outEvents, void** outData);
 
 /**
  * Wakes the poll asynchronously.
